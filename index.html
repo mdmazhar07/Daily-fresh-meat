@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FreshFlow - Premium Water & Meat Delivery | Fresh Quality Guaranteed</title>
+  <meta name="description" content="Order fresh water and premium meat online. Fast 30-minute delivery, quality guaranteed. Cash on delivery and UPI payment available.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --primary-light: #3b82f6;
+      --secondary-color: #059669;
+      --secondary-dark: #047857;
+      --accent-color: #f59e0b;
+      --success-color: #10b981;
+      --error-color: #ef4444;
+      --warning-color: #f59e0b;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      scroll-behavior: smooth;
+      background-color: var(--gray-50);
+      color: var(--gray-900);
+      font-feature-settings: 'kern' 1, 'liga' 1;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Enhanced Animations */
+    .cart-badge { 
+      animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Professional Card System */
+    .product-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .product-card:hover { 
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--gray-300);
+    }
+    
+    .card-elevated {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-elevated:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    
+    .card-header {
+      padding: 24px 24px 0 24px;
+      border-bottom: 1px solid var(--gray-100);
+      margin-bottom: 24px;
+    }
+    
+    .card-body {
+      padding: 24px;
+    }
+    
+    .card-footer {
+      padding: 0 24px 24px 24px;
+      border-top: 1px solid var(--gray-100);
+      margin-top: 24px;
+      padding-top: 24px;
+    }
+    
+    .fade-in { 
+      animation: fadeInUp 0.6s ease-out forwards; 
+      opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+    
+    .slide-in-right {
+      animation: slideInRight 0.4s ease-out;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    
+    .quantity-selector { 
+      user-select: none; 
+    }
+    
+    .floating-cart { 
+      position: fixed; 
+      bottom: 100px; 
+      right: 24px; 
+      z-index: 1000;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1));
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    /* Loading States */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* Professional Button System */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      letter-spacing: 0.025em;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary:focus {
+      outline: none;
+      box-shadow: var(--shadow-lg), 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .btn-secondary {
+      background: white;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 12px;
+      color: var(--gray-700);
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    
+    .btn-success:hover {
+      background: linear-gradient(135deg, var(--secondary-dark), var(--secondary-color));
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    /* Enhanced Modal Backdrop */
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Responsive Grid */
+    .responsive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    @media (max-width: 640px) {
+      .responsive-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+      }
+    }
+    
+    /* Professional Form System */
+    .form-input {
+      background: white;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--gray-900);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-md), 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .form-input:hover:not(:focus) {
+      border-color: var(--gray-400);
+    }
+    
+    .form-input::placeholder {
+      color: var(--gray-500);
+      font-weight: 400;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+      letter-spacing: 0.025em;
+    }
+    
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-select {
+      background: white;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--gray-900);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 12px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-md), 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+    
+    /* Status Indicators */
+    .status-indicator {
+      position: relative;
+    }
+    
+    .status-indicator::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+    
+    .status-online::before {
+      background: #10b981;
+    }
+    
+    .status-busy::before {
+      background: #f59e0b;
+    }
+    
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+      50% { opacity: 0.5; transform: translateY(-50%) scale(1.2); }
+    }
+    
+    /* Enhanced Product Cards */
+    .product-image-container {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+    }
+    
+    .price-tag {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Loading Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-200 backdrop-blur-sm bg-white/95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center space-x-8">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-md">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="white"/>
+                <path d="M19 15L19.5 17L22 17.5L19.5 18L19 20L18.5 18L16 17.5L18.5 17L19 15Z" fill="white"/>
+                <path d="M5 6L5.5 7.5L7 8L5.5 8.5L5 10L4.5 8.5L3 8L4.5 7.5L5 6Z" fill="white"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-gray-900 tracking-tight">FreshFlow</div>
+              <div class="text-xs font-medium text-gray-500 -mt-1 tracking-wide">Premium Quality Delivery</div>
+            </div>
+          </div>
+          
+          <div class="hidden lg:flex items-center space-x-6 pl-8 border-l border-gray-200">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div class="absolute inset-0 w-3 h-3 bg-green-500 rounded-full animate-ping opacity-75"></div>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold text-green-700">Open Now</span>
+                <span class="text-xs text-gray-500">Until 11:00 PM</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="#3B82F6"/>
+                </svg>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold text-gray-900">Fast Delivery</span>
+                <span class="text-xs text-gray-500">30-45 minutes</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold text-gray-900">Quality Assured</span>
+                <span class="text-xs text-gray-500">100% fresh</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- Location Selector -->
+          <div class="hidden sm:flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-2 border">
+            <span class="text-blue-600">📍</span>
+            <div class="text-sm">
+              <div class="text-gray-500 text-xs">Delivering to</div>
+              <div class="font-medium text-gray-800" id="delivery-location">Select Location</div>
+            </div>
+            <button onclick="changeLocation()" class="text-blue-600 hover:text-blue-800 ml-2 text-sm font-medium">
+              Change
+            </button>
+          </div>
+          
+          <!-- User Profile Section -->
+          <div id="user-profile" class="hidden flex items-center space-x-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-200">
+            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <span class="text-white text-sm font-bold" id="user-initial">U</span>
+            </div>
+            <div class="text-sm">
+              <div class="font-medium text-blue-800" id="user-name-display"></div>
+              <div class="text-blue-600 text-xs">Registered User</div>
+            </div>
+            <button onclick="showUserProfile()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Profile
+            </button>
+          </div>
+          
+          <!-- Login Button -->
+          <button id="login-btn" onclick="showUserLogin()" class="btn-primary text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300">
+            <span class="flex items-center space-x-2">
+              <span>👤</span>
+              <span>Login</span>
+            </span>
+          </button>
+          
+          <!-- Admin Button -->
+          <button onclick="toggleAdmin()" class="flex items-center space-x-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium shadow-lg">
+            <span>⚙️</span>
+            <span>Admin</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Location Bar -->
+      <div class="sm:hidden pb-3 border-t border-gray-100 pt-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-blue-600">📍</span>
+            <span class="text-sm text-gray-600">Delivering to:</span>
+            <span class="font-medium text-gray-800" id="delivery-location-mobile">Select Location</span>
+          </div>
+          <button onclick="changeLocation()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+            Change
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- User Login Modal -->
+  <div id="user-login-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <h2 class="text-2xl font-semibold mb-6 text-center">👤 Login / Register</h2>
+      <form id="user-login-form">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+            <input type="text" id="user-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your full name">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
+            <input type="tel" id="user-phone" required pattern="[0-9]{10}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter 10-digit mobile number">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Complete Address *</label>
+            <textarea id="user-address" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="House/Flat no, Street, Area, City, Pincode"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email (Optional)</label>
+            <input type="email" id="user-email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your email address">
+          </div>
+        </div>
+        <div class="flex space-x-4 mt-6">
+          <button type="button" onclick="closeUserLogin()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">Cancel</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Save & Continue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div id="user-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">👤 My Profile</h2>
+        <button onclick="closeUserProfile()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+      </div>
+      
+      <div class="space-y-4">
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <h3 class="font-medium text-blue-800 mb-2">Personal Information</h3>
+          <p class="text-sm text-blue-700"><strong>Name:</strong> <span id="profile-name"></span></p>
+          <p class="text-sm text-blue-700"><strong>Phone:</strong> <span id="profile-phone"></span></p>
+          <p class="text-sm text-blue-700"><strong>Email:</strong> <span id="profile-email"></span></p>
+        </div>
+        
+        <div class="bg-green-50 p-4 rounded-lg">
+          <h3 class="font-medium text-green-800 mb-2">Delivery Address</h3>
+          <p class="text-sm text-green-700" id="profile-address"></p>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-medium text-gray-800 mb-2">Order History</h3>
+          <p class="text-sm text-gray-600">Total Orders: <span id="user-order-count" class="font-medium">0</span></p>
+          <p class="text-sm text-gray-600">Total Spent: ₹<span id="user-total-spent" class="font-medium">0</span></p>
+        </div>
+      </div>
+      
+      <div class="flex space-x-3 mt-6">
+        <button onclick="editUserProfile()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Edit Profile</button>
+        <button onclick="logoutUser()" class="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Selection Modal -->
+  <div id="location-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <h2 class="text-2xl font-semibold mb-6 text-center">📍 Select Delivery Location</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Enter your area/locality</label>
+          <input type="text" id="location-input" placeholder="e.g., Downtown, Main Street, etc." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="selectLocation('Downtown')" class="p-3 text-left border rounded-lg hover:bg-gray-50">
+            <div class="font-medium">Downtown</div>
+            <div class="text-xs text-gray-500">30-40 mins</div>
+          </button>
+          <button onclick="selectLocation('Uptown')" class="p-3 text-left border rounded-lg hover:bg-gray-50">
+            <div class="font-medium">Uptown</div>
+            <div class="text-xs text-gray-500">35-45 mins</div>
+          </button>
+          <button onclick="selectLocation('Suburbs')" class="p-3 text-left border rounded-lg hover:bg-gray-50">
+            <div class="font-medium">Suburbs</div>
+            <div class="text-xs text-gray-500">40-50 mins</div>
+          </button>
+          <button onclick="selectLocation('City Center')" class="p-3 text-left border rounded-lg hover:bg-gray-50">
+            <div class="font-medium">City Center</div>
+            <div class="text-xs text-gray-500">25-35 mins</div>
+          </button>
+        </div>
+        <button onclick="confirmLocation()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Confirm Location</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-gray-900 via-blue-900 to-blue-800 text-white py-20 md:py-32 overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent"></div>
+      <div class="absolute top-0 left-0 w-full h-full opacity-5">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <div class="fade-in">
+          <div class="inline-flex items-center px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full text-blue-200 text-sm font-medium mb-8">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+              <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+            Premium Quality • Fast Delivery • Trusted by 1000+ customers
+          </div>
+          <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight tracking-tight">
+            <span class="block text-white">Fresh Water &</span>
+            <span class="block bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">Premium Meat</span>
+          </h1>
+          <p class="text-xl md:text-2xl mb-12 text-gray-300 max-w-4xl mx-auto leading-relaxed font-light">
+            Experience the finest quality products delivered fresh to your doorstep. Professional service, guaranteed freshness, and unmatched convenience.
+          </p>
+        </div>
+        
+        <!-- CTA Buttons -->
+        <div class="fade-in flex flex-col sm:flex-row gap-6 justify-center mb-16">
+          <button onclick="document.getElementById('products-container').scrollIntoView({behavior: 'smooth'})" class="group relative bg-white text-gray-900 hover:bg-gray-50 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border border-gray-200">
+            <span class="flex items-center justify-center space-x-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="group-hover:scale-110 transition-transform">
+                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16.5 5.1 16.5H17M17 13V17C17 18.1 16.1 19 15 19H9C7.9 19 7 18.1 7 17V13M9 21C9.6 21 10 20.6 10 20S9.6 19 9 19 8 19.4 8 20 8.4 21 9 21ZM20 21C20.6 21 21 20.6 21 20S20.6 19 20 19 19 19.4 19 20 19.4 21 20 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Shop Now</span>
+            </span>
+          </button>
+          <button onclick="changeLocation()" class="group relative bg-transparent border-2 border-white/30 backdrop-blur-sm text-white hover:bg-white/10 hover:border-white/50 px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105">
+            <span class="flex items-center justify-center space-x-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="group-hover:scale-110 transition-transform">
+                <path d="M21 10C21 17L12 23L3 10C3 6.13 7.03 3 12 3S21 6.13 21 10Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>Set Location</span>
+            </span>
+          </button>
+        </div>
+        
+        <!-- Features Grid -->
+        <div class="fade-in grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div class="group bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white"/>
+              </svg>
+            </div>
+            <h3 class="font-bold text-xl mb-3 text-white">Lightning Fast</h3>
+            <p class="text-gray-300 text-sm leading-relaxed">Professional 30-45 minute delivery guaranteed to your location with real-time tracking</p>
+          </div>
+          <div class="group bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500">
+            <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="font-bold text-xl mb-3 text-white">Quality Assured</h3>
+            <p class="text-gray-300 text-sm leading-relaxed">100% fresh products with professional quality guarantee and satisfaction promise</p>
+          </div>
+          <div class="group bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" stroke="white" stroke-width="2"/>
+                <line x1="1" y1="10" x2="23" y2="10" stroke="white" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3 class="font-bold text-xl mb-3 text-white">Secure Payment</h3>
+            <p class="text-gray-300 text-sm leading-relaxed">Multiple payment options including cash on delivery and secure UPI transactions</p>
+          </div>
+        </div>
+        
+        <!-- Trust Indicators -->
+        <div class="fade-in mt-12 flex flex-wrap justify-center items-center gap-8 text-blue-200">
+          <div class="flex items-center space-x-2">
+            <span class="text-green-400">✓</span>
+            <span class="text-sm font-medium">1000+ Happy Customers</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-green-400">✓</span>
+            <span class="text-sm font-medium">Same Day Delivery</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-green-400">✓</span>
+            <span class="text-sm font-medium">24/7 Support</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search and Filter -->
+  <section class="py-16 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-6">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Smart Search & Filtering
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Browse Our Products</h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Find exactly what you need with our intelligent search and advanced filtering system</p>
+      </div>
+      
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-8 lg:space-y-0 gap-8">
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-3xl mx-auto lg:mx-0">
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Search for water, chicken, mutton, or any product..." 
+              class="w-full pl-16 pr-16 py-5 text-lg font-medium bg-white border-2 border-gray-200 rounded-2xl shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:shadow-lg transition-all duration-300 placeholder-gray-500"
+              oninput="searchProducts()"
+            >
+            <div class="absolute inset-y-0 right-0 pr-6 flex items-center">
+              <button id="clear-search" onclick="clearSearch()" class="hidden p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <!-- Category Filter -->
+          <div class="relative">
+            <select 
+              id="category-filter" 
+              onchange="filterByCategory()" 
+              class="form-input appearance-none bg-white px-6 py-4 pr-12 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-all duration-300 font-medium"
+            >
+              <option value="all">🏷️ All Categories</option>
+              <option value="water">💧 Water Products</option>
+              <option value="chicken">🐔 Chicken</option>
+              <option value="mutton">🥩 Mutton</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <span class="text-gray-400">▼</span>
+            </div>
+          </div>
+          
+          <!-- Sort Filter -->
+          <div class="relative">
+            <select 
+              id="sort-filter" 
+              onchange="sortProducts()" 
+              class="form-input appearance-none bg-white px-6 py-4 pr-12 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-all duration-300 font-medium"
+            >
+              <option value="default">📊 Sort by</option>
+              <option value="price-low">💰 Price: Low to High</option>
+              <option value="price-high">💸 Price: High to Low</option>
+              <option value="popular">⭐ Most Popular</option>
+              <option value="newest">🆕 Newest First</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+              <span class="text-gray-400">▼</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Filter Tags -->
+      <div class="mt-6 flex flex-wrap gap-3 justify-center">
+        <button onclick="quickFilter('popular')" class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors border border-blue-200">
+          ⭐ Popular Items
+        </button>
+        <button onclick="quickFilter('under-500')" class="px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-medium hover:bg-green-100 transition-colors border border-green-200">
+          💰 Under ₹500
+        </button>
+        <button onclick="quickFilter('premium')" class="px-4 py-2 bg-purple-50 text-purple-600 rounded-full text-sm font-medium hover:bg-purple-100 transition-colors border border-purple-200">
+          👑 Premium Quality
+        </button>
+        <button onclick="quickFilter('fast-delivery')" class="px-4 py-2 bg-orange-50 text-orange-600 rounded-full text-sm font-medium hover:bg-orange-100 transition-colors border border-orange-200">
+          ⚡ Fast Delivery
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Results Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Our Products</h2>
+          <p class="text-gray-600 mt-1" id="results-count">Showing all products</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button onclick="toggleView('grid')" id="grid-view" class="p-2 rounded-lg bg-blue-600 text-white">
+            <span>⊞</span>
+          </button>
+          <button onclick="toggleView('list')" id="list-view" class="p-2 rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300">
+            <span>☰</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Loading State -->
+      <div id="loading-products" class="hidden">
+        <div class="responsive-grid">
+          <div class="skeleton h-80 rounded-2xl"></div>
+          <div class="skeleton h-80 rounded-2xl"></div>
+          <div class="skeleton h-80 rounded-2xl"></div>
+          <div class="skeleton h-80 rounded-2xl"></div>
+        </div>
+      </div>
+      
+      <!-- Products Grid -->
+      <div id="products-container" class="responsive-grid">
+        <!-- Products will be dynamically loaded here -->
+      </div>
+      
+      <!-- No Results State -->
+      <div id="no-results" class="hidden text-center py-16">
+        <div class="max-w-md mx-auto">
+          <div class="text-6xl mb-6">🔍</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">No products found</h3>
+          <p class="text-gray-600 mb-8">We couldn't find any products matching your search. Try adjusting your filters or search terms.</p>
+          <div class="space-y-3">
+            <button onclick="clearAllFilters()" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              Clear All Filters
+            </button>
+            <button onclick="showAllProducts()" class="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+              Show All Products
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Load More Button -->
+      <div id="load-more-container" class="hidden text-center mt-12">
+        <button onclick="loadMoreProducts()" class="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+          Load More Products
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Floating Cart Button -->
+  <div id="floating-cart" class="floating-cart hidden">
+    <button onclick="openCart()" class="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 border-4 border-white">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl group-hover:animate-bounce">🛒</span>
+        <div class="hidden sm:block text-left">
+          <div class="text-sm font-bold">Cart</div>
+          <div class="text-xs opacity-90" id="floating-cart-total">₹0</div>
+        </div>
+      </div>
+      <span id="floating-cart-count" class="cart-badge absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full h-7 w-7 flex items-center justify-center font-bold shadow-lg border-2 border-white">0</span>
+      
+      <!-- Pulse Animation for New Items -->
+      <div id="cart-pulse" class="absolute inset-0 bg-blue-400 rounded-2xl opacity-0 animate-ping"></div>
+    </button>
+  </div>
+
+  <!-- Cart Sidebar -->
+  <div id="cart-sidebar" class="fixed right-0 top-0 h-full w-full md:w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+    <div class="flex flex-col h-full">
+      <!-- Cart Header -->
+      <div class="p-6 border-b bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-semibold">Your Order</h2>
+            <p class="text-sm text-gray-600" id="cart-items-count">0 items</p>
+          </div>
+          <button onclick="closeCart()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+        </div>
+      </div>
+
+      <!-- Cart Items -->
+      <div id="cart-items" class="flex-1 overflow-y-auto p-6">
+        <div class="text-center py-12">
+          <div class="text-4xl mb-4">🛒</div>
+          <p class="text-gray-500">Your cart is empty</p>
+          <p class="text-sm text-gray-400 mt-2">Add some delicious items!</p>
+        </div>
+      </div>
+
+      <!-- Cart Footer -->
+      <div class="border-t bg-gray-50 p-6">
+        <button id="checkout-btn" onclick="proceedToCheckout()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 transition-colors mb-4" disabled>
+          Proceed to Checkout
+        </button>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal">₹0</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span>Delivery Fee:</span>
+            <span id="delivery-fee">₹40</span>
+          </div>
+          <div class="flex justify-between font-semibold text-lg border-t pt-2">
+            <span>Total:</span>
+            <span id="cart-total">₹40</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 text-center mt-2">Minimum order: ₹250</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <h2 class="text-2xl font-semibold mb-6">Delivery Details</h2>
+      
+      <!-- User Info Display (for logged in users) -->
+      <div id="logged-user-info" class="hidden mb-6 p-4 bg-blue-50 rounded-lg">
+        <h3 class="font-medium text-blue-800 mb-2">Delivering to:</h3>
+        <p class="text-sm text-blue-700"><strong>Name:</strong> <span id="checkout-user-name"></span></p>
+        <p class="text-sm text-blue-700"><strong>Phone:</strong> <span id="checkout-user-phone"></span></p>
+        <p class="text-sm text-blue-700"><strong>Address:</strong> <span id="checkout-user-address"></span></p>
+        <button onclick="editDeliveryDetails()" class="text-xs text-blue-600 hover:text-blue-800 mt-2">Change delivery details</button>
+      </div>
+      
+      <form id="checkout-form">
+        <div id="guest-checkout-fields">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+            <input type="text" id="customer-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+            <input type="tel" id="customer-phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Complete Address *</label>
+            <textarea id="customer-address" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="House/Flat no, Street, Landmark"></textarea>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Time</label>
+          <select id="delivery-time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option>ASAP (30-45 mins)</option>
+            <option>1-2 hours</option>
+            <option>2-4 hours</option>
+            <option>Tomorrow morning (9-12 PM)</option>
+            <option>Tomorrow evening (5-8 PM)</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="payment" value="cod" checked class="mr-2">
+              <span>💵 Cash on Delivery</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="payment" value="upi" class="mr-2">
+              <span>📱 UPI Payment (Real Payment Required)</span>
+            </label>
+          </div>
+          <div id="upi-details" class="hidden mt-3 p-3 bg-blue-50 rounded-lg">
+            <p class="text-sm text-blue-800 font-medium">⚠️ Real UPI Payment Required:</p>
+            <p class="text-sm text-blue-700 mt-1">Pay to UPI ID: <span class="font-mono bg-white px-2 py-1 rounded">9603831708@ybl</span></p>
+            <p class="text-xs text-blue-600 mt-1">You must complete actual payment from your UPI app. Order will be confirmed only after successful payment.</p>
+          </div>
+          <p id="payment-warning" class="text-red-500 text-sm hidden mt-1">⚠️ Orders above ₹500 require online payment.</p>
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+          <textarea id="special-instructions" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Any special delivery instructions..."></textarea>
+        </div>
+        <div class="flex space-x-4">
+          <button type="button" onclick="closeCheckout()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">Cancel</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Place Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full text-center">
+      <div class="text-6xl mb-4">✅</div>
+      <h2 class="text-2xl font-semibold mb-4">Order Placed Successfully!</h2>
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <p class="text-sm text-gray-600 mb-1">Order #<span id="order-number" class="font-bold"></span></p>
+        <p class="text-sm text-gray-600">Estimated delivery: <span id="estimated-delivery" class="font-medium"></span></p>
+      </div>
+      <p class="text-gray-600 mb-6">We'll call you to confirm your order and provide delivery updates.</p>
+      <div class="flex space-x-3">
+        <button onclick="closeSuccess()" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">Continue Shopping</button>
+        <button onclick="trackOrder()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Track Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Tracking Modal -->
+  <div id="tracking-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Track Your Order</h2>
+        <button onclick="closeTracking()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+      </div>
+      
+      <div class="mb-6">
+        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+          <p class="text-sm text-gray-600">Order #<span id="tracking-order-id" class="font-bold"></span></p>
+          <p class="text-sm text-gray-600">Placed: <span id="tracking-order-time" class="font-medium"></span></p>
+          <p class="text-lg font-semibold text-blue-600 mt-2">Total: ₹<span id="tracking-order-total"></span></p>
+        </div>
+        
+        <div class="space-y-4">
+          <div id="status-pending" class="flex items-center p-3 rounded-lg bg-yellow-50 border-l-4 border-yellow-400">
+            <div class="flex-shrink-0 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+            <div class="ml-4">
+              <p class="font-medium text-yellow-800">Order Confirmed</p>
+              <p class="text-sm text-yellow-600">Your order has been received and confirmed</p>
+            </div>
+          </div>
+          
+          <div id="status-processing" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+            <div class="ml-4">
+              <p class="font-medium text-gray-600">Preparing Order</p>
+              <p class="text-sm text-gray-500">Your order is being prepared</p>
+            </div>
+          </div>
+          
+          <div id="status-ready" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+            <div class="ml-4">
+              <p class="font-medium text-gray-600">Ready for Delivery</p>
+              <p class="text-sm text-gray-500">Order is ready and will be dispatched soon</p>
+            </div>
+          </div>
+          
+          <div id="status-out-for-delivery" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">4</div>
+            <div class="ml-4">
+              <p class="font-medium text-gray-600">Out for Delivery</p>
+              <p class="text-sm text-gray-500">Your order is on the way</p>
+            </div>
+          </div>
+          
+          <div id="status-delivered" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">5</div>
+            <div class="ml-4">
+              <p class="font-medium text-gray-600">Delivered</p>
+              <p class="text-sm text-gray-500">Order has been delivered successfully</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h4 class="font-medium mb-2">Order Items:</h4>
+        <div id="tracking-items" class="space-y-1">
+          <!-- Items will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <h2 class="text-2xl font-semibold mb-6 text-center">🔐 Admin Login</h2>
+      <form id="admin-login-form">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Admin Password</label>
+          <input type="password" id="admin-password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter admin password">
+          <p id="password-error" class="text-red-500 text-sm hidden mt-1">❌ Incorrect password. Please try again.</p>
+        </div>
+        <div class="flex space-x-4">
+          <button type="button" onclick="closeAdminLogin()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">Cancel</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="admin-panel" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold">Admin Panel - Product Management</h2>
+          <p class="text-sm text-gray-600">Manage products, prices, and orders</p>
+        </div>
+        <button onclick="toggleAdmin()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+      </div>
+
+      <!-- Admin Tabs -->
+      <div class="flex space-x-4 mb-6 border-b">
+        <button onclick="showAdminTab('products')" id="products-tab" class="px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-medium">Products</button>
+        <button onclick="showAdminTab('orders')" id="orders-tab" class="px-4 py-2 text-gray-600 hover:text-blue-600">Orders</button>
+      </div>
+
+      <!-- Products Management -->
+      <div id="admin-products" class="space-y-6">
+        <!-- Add New Product -->
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4">Add New Product</h3>
+          <form id="add-product-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
+              <input type="text" id="new-product-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Price (₹)</label>
+              <input type="number" id="new-product-price" step="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <select id="new-product-category" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Category</option>
+                <option value="water">Water</option>
+                <option value="chicken">Chicken</option>
+                <option value="mutton">Mutton</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Product Photo</label>
+              <input type="file" id="new-product-photo" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <p class="text-xs text-gray-500 mt-1">Upload JPG, PNG, or GIF (max 5MB)</p>
+              <div id="photo-preview" class="mt-2 hidden">
+                <img id="preview-image" class="w-20 h-20 object-cover rounded-lg border">
+              </div>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <input type="text" id="new-product-description" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" id="new-product-popular" class="mr-2">
+              <label class="text-sm text-gray-700">Mark as Popular</label>
+            </div>
+            <div class="md:col-span-2 lg:col-span-1">
+              <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Add Product</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Existing Products -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Existing Products</h3>
+          <div id="admin-products-list" class="space-y-4">
+            <!-- Products will be loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Management -->
+      <div id="admin-orders" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold">Recent Orders</h3>
+          <div class="flex space-x-2">
+            <select id="order-status-filter" onchange="filterOrdersByStatus()" class="text-sm px-3 py-1 border rounded">
+              <option value="all">All Orders</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button onclick="refreshOrders()" class="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded">🔄 Refresh</button>
+          </div>
+        </div>
+        <div id="admin-orders-list">
+          <p class="text-gray-500 text-center py-8">No orders yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPI Payment Modal -->
+  <div id="upi-payment-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <div class="text-center mb-6">
+        <div class="text-4xl mb-4">💳</div>
+        <h2 class="text-2xl font-semibold mb-2">Complete Payment</h2>
+        <p class="text-gray-600">Choose your preferred UPI app to pay</p>
+      </div>
+      
+      <div class="bg-blue-50 p-4 rounded-lg mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm text-gray-600">Order #<span id="upi-order-id"></span></span>
+          <span class="font-bold text-blue-600">₹<span id="upi-amount"></span></span>
+        </div>
+        <p class="text-sm text-gray-600">Pay to: <span class="font-mono bg-white px-2 py-1 rounded">9603831708@ybl</span></p>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <button onclick="payWithUPI('phonepe')" class="w-full flex items-center justify-center space-x-3 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors">
+          <span class="text-xl">📱</span>
+          <span class="font-medium">Pay with PhonePe</span>
+        </button>
+        
+        <button onclick="payWithUPI('googlepay')" class="w-full flex items-center justify-center space-x-3 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <span class="text-xl">💳</span>
+          <span class="font-medium">Pay with Google Pay</span>
+        </button>
+        
+        <button onclick="payWithUPI('paytm')" class="w-full flex items-center justify-center space-x-3 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors">
+          <span class="text-xl">💰</span>
+          <span class="font-medium">Pay with Paytm</span>
+        </button>
+        
+        <button onclick="payWithUPI('generic')" class="w-full flex items-center justify-center space-x-3 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors">
+          <span class="text-xl">🏦</span>
+          <span class="font-medium">Other UPI Apps</span>
+        </button>
+      </div>
+
+      <div class="text-center">
+        <button onclick="cancelUPIPayment()" class="text-gray-500 hover:text-gray-700 text-sm">Cancel Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Processing Modal -->
+  <div id="payment-processing-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full text-center">
+      <div class="text-4xl mb-4">⏳</div>
+      <h2 class="text-2xl font-semibold mb-4">Waiting for Payment</h2>
+      <p class="text-gray-600 mb-6">Complete the actual payment in your UPI app. We're monitoring for real payment confirmation...</p>
+      
+      <div class="bg-orange-50 p-4 rounded-lg mb-6 border-l-4 border-orange-400">
+        <div class="flex items-center justify-center space-x-2 mb-2">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
+          <span class="text-sm text-orange-800 font-medium">Verifying real payment...</span>
+        </div>
+        <p class="text-xs text-orange-600">⚠️ This requires actual money transfer to confirm order</p>
+      </div>
+
+      <div class="text-sm text-gray-500 space-y-1">
+        <p>✓ UPI app opened successfully</p>
+        <p>✓ Payment details pre-filled</p>
+        <p id="payment-status-text">⏳ Waiting for actual payment completion...</p>
+        <p class="text-xs text-red-600 mt-2">⚠️ Order will only be confirmed after real payment is received</p>
+      </div>
+      
+      <div class="mt-6 space-y-2">
+        <button onclick="manualPaymentConfirmation()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm">I've Completed the Payment</button>
+        <button onclick="cancelUPIPayment()" class="w-full text-gray-500 hover:text-gray-700 text-sm">Cancel Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Success Modal -->
+  <div id="payment-success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full text-center">
+      <div class="text-6xl mb-4">✅</div>
+      <h2 class="text-2xl font-semibold mb-4 text-green-600">Payment Successful!</h2>
+      <p class="text-gray-600 mb-4">Your payment has been processed successfully.</p>
+      
+      <div class="bg-green-50 p-4 rounded-lg mb-6">
+        <p class="text-sm text-green-800 mb-1">Transaction ID: <span id="transaction-id" class="font-mono"></span></p>
+        <p class="text-sm text-green-800">Amount: ₹<span id="paid-amount"></span></p>
+      </div>
+
+      <p class="text-gray-600 mb-6">Your order has been confirmed and is being processed.</p>
+      
+      <div class="flex space-x-3">
+        <button onclick="closePaymentSuccess()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">Continue Shopping</button>
+        <button onclick="trackOrderFromPayment()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Track Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Failed Modal -->
+  <div id="payment-failed-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full text-center">
+      <div class="text-6xl mb-4">❌</div>
+      <h2 class="text-2xl font-semibold mb-4 text-red-600">Payment Failed</h2>
+      <p class="text-gray-600 mb-4">We couldn't process your payment. Please try again.</p>
+      
+      <div class="bg-red-50 p-4 rounded-lg mb-6">
+        <p class="text-sm text-red-800 mb-1">Reason: <span id="failure-reason">Transaction was cancelled or failed</span></p>
+        <p class="text-sm text-red-800">Order #<span id="failed-order-id"></span> has been cancelled</p>
+      </div>
+
+      <div class="flex space-x-3">
+        <button onclick="retryPayment()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          🔄 Try Again
+        </button>
+        <button onclick="switchToCOD()" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+          💵 Pay on Delivery
+        </button>
+      </div>
+      
+      <button onclick="cancelFailedOrder()" class="w-full mt-3 text-gray-500 hover:text-gray-700 text-sm">Cancel Order</button>
+    </div>
+  </div>
+
+  <!-- Cart Overlay -->
+  <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="closeCart()"></div>
+
+  <script>
+    // Product Database
+    let products = [
+      // Water Products
+      { id: 1, name: "Pure Spring Water", price: 299, category: "water", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBGN0ZBIiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjMzMzIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iIzMzOTNERiI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJNMTIgMTguNzVhNi4wMDcgNi4wMDcgMCAwIDEtNi02VjZhNiA2IDAgMCAxIDEyIDB2Ni43NWE2LjAwNyA2LjAwNyAwIDAgMS02IDZaIiAvPgogIDxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTEyIDEyLjc1YTIuMjUgMi4yNSAwIDEgMSAwLTQuNSAyLjI1IDIuMjUgMCAwIDEgMCA0LjVaIiAvPgo8L3N2Zz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzOTNERiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5XYXRlcjwvdGV4dD4KPC9zdmc+", description: "5L bottle of natural spring water", popular: true },
+      { id: 2, name: "Alkaline Water", price: 199, category: "water", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBGN0ZBIiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjMzMzIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iIzMzOTNERiI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJNMTIgMTguNzVhNi4wMDcgNi4wMDcgMCAwIDEtNi02VjZhNiA2IDAgMCAxIDEyIDB2Ni43NWE2LjAwNyA2LjAwNyAwIDAgMS02IDZaIiAvPgogIDxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTEyIDEyLjc1YTIuMjUgMi4yNSAwIDEgMSAwLTQuNSAyLjI1IDIuMjUgMCAwIDEgMCA0LjVaIiAvPgo8L3N2Zz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzOTNERiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5BbGthbGluZTwvdGV4dD4KPC9zdmc+", description: "1.5L pH balanced alkaline water", popular: false },
+      { id: 3, name: "Sparkling Water", price: 149, category: "water", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBGN0ZBIiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjMzMzIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iIzMzOTNERiI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJNMTIgMTguNzVhNi4wMDcgNi4wMDcgMCAwIDEtNi02VjZhNiA2IDAgMCAxIDEyIDB2Ni43NWE2LjAwNyA2LjAwNyAwIDAgMS02IDZaIiAvPgogIDxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTEyIDEyLjc1YTIuMjUgMi4yNSAwIDEgMSAwLTQuNSAyLjI1IDIuMjUgMCAwIDEgMCA0LjVaIiAvPgo8L3N2Zz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzOTNERiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5TcGFya2xpbmc8L3RleHQ+Cjwvc3ZnPg==", description: "500ml premium sparkling water", popular: true },
+      { id: 4, name: "Mineral Water", price: 229, category: "water", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBGN0ZBIiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjMzMzIj4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iIzMzOTNERiI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJNMTIgMTguNzVhNi4wMDcgNi4wMDcgMCAwIDEtNi02VjZhNiA2IDAgMCAxIDEyIDB2Ni43NWE2LjAwNyA2LjAwNyAwIDAgMS02IDZaIiAvPgogIDxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTEyIDEyLjc1YTIuMjUgMi4yNSAwIDEgMSAwLTQuNSAyLjI1IDIuMjUgMCAwIDEgMCA0LjVaIiAvPgo8L3N2Zz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzOTNERiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5NaW5lcmFsPC90ZXh0Pgo8L3N2Zz4=", description: "2L enriched mineral water", popular: false },
+      
+      // Chicken Products
+      { id: 9, name: "Fresh Chicken Breast", price: 999, category: "chicken", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkVGM0M3IiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjRjU5RTBCIj4KICA8cGF0aCBkPSJNMTIgMmMtMS4xIDAtMiAuOS0yIDJ2NGMwIDEuMS45IDIgMiAyaDJjMS4xIDAgMi0uOSAyLTJWNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnoiLz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0Y1OUUwQiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5DaGlja2VuPC90ZXh0Pgo8L3N2Zz4=", description: "1kg boneless chicken breast", popular: true },
+      { id: 10, name: "Chicken Wings", price: 699, category: "chicken", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkVGM0M3IiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjRjU5RTBCIj4KICA8cGF0aCBkPSJNMTIgMmMtMS4xIDAtMiAuOS0yIDJ2NGMwIDEuMS45IDIgMiAyaDJjMS4xIDAgMi0uOSAyLTJWNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnoiLz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0Y1OUUwQiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5XaW5nczwvdGV4dD4KPC9zdmc+", description: "500g fresh chicken wings", popular: true },
+      
+      // Mutton Products
+      { id: 15, name: "Mutton Chops", price: 1999, category: "mutton", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkVFMkUyIiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjREM0NjI2Ij4KICA8cGF0aCBkPSJNMTIgMmMtMS4xIDAtMiAuOS0yIDJ2NGMwIDEuMS45IDIgMiAyaDJjMS4xIDAgMi0uOSAyLTJWNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnoiLz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0RDNDYyNiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5NdXR0b248L3RleHQ+Cjwvc3ZnPg==", description: "500g tender mutton chops", popular: true },
+      { id: 18, name: "Mutton Mince", price: 1599, category: "mutton", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkVFMkUyIiByeD0iMTAiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjREM0NjI2Ij4KICA8cGF0aCBkPSJNMTIgMmMtMS4xIDAtMiAuOS0yIDJ2NGMwIDEuMS45IDIgMiAyaDJjMS4xIDAgMi0uOSAyLTJWNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnptMCA2Yy0xLjEgMC0yIC45LTIgMnY0YzAgMS4xLjkgMiAyIDJoMmMxLjEgMCAyLS45IDItMnYtNGMwLTEuMS0uOS0yLTItMmgtMnoiLz4KPC9zdmc+Cjx0ZXh0IHg9IjUwIiB5PSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0RDNDYyNiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj5NaW5jZTwvdGV4dD4KPC9zdmc+", description: "500g fresh mutton mince", popular: true },
+    ];
+    
+    let nextProductId = 21;
+
+    let cart = [];
+    let orders = [];
+    let orderCounter = 1000;
+    let currentLocation = null;
+    let filteredProducts = [...products];
+    let currentUser = null;
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      showLoadingState();
+      setTimeout(() => {
+        displayProducts();
+        updateCartDisplay();
+        loadSavedLocation();
+        loadUserSession();
+        hideLoadingState();
+        initializeAnimations();
+      }, 800);
+    });
+
+    // Professional UI Functions
+    function showLoadingState() {
+      document.getElementById('loading-products').classList.remove('hidden');
+      document.getElementById('products-container').classList.add('hidden');
+    }
+
+    function hideLoadingState() {
+      document.getElementById('loading-products').classList.add('hidden');
+      document.getElementById('products-container').classList.remove('hidden');
+    }
+
+    function initializeAnimations() {
+      // Add fade-in animation to product cards
+      const cards = document.querySelectorAll('.product-card');
+      cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast bg-white border-l-4 ${
+        type === 'success' ? 'border-green-500' : 
+        type === 'error' ? 'border-red-500' : 
+        type === 'warning' ? 'border-yellow-500' : 'border-blue-500'
+      } p-4 rounded-lg shadow-lg max-w-sm`;
+      
+      toast.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <div class="text-2xl">
+            ${type === 'success' ? '✅' : 
+              type === 'error' ? '❌' : 
+              type === 'warning' ? '⚠️' : 'ℹ️'}
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">${message}</p>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+            ✕
+          </button>
+        </div>
+      `;
+      
+      document.getElementById('toast-container').appendChild(toast);
+      
+      // Show toast
+      setTimeout(() => toast.classList.add('show'), 100);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    function clearSearch() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('clear-search').classList.add('hidden');
+      searchProducts();
+    }
+
+    function clearAllFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('category-filter').value = 'all';
+      document.getElementById('sort-filter').value = 'default';
+      document.getElementById('clear-search').classList.add('hidden');
+      filteredProducts = [...products];
+      displayProducts(filteredProducts);
+      updateResultsCount();
+    }
+
+    function showAllProducts() {
+      clearAllFilters();
+    }
+
+    function quickFilter(type) {
+      switch(type) {
+        case 'popular':
+          document.getElementById('sort-filter').value = 'popular';
+          sortProducts();
+          break;
+        case 'under-500':
+          filteredProducts = products.filter(p => p.price < 500);
+          displayProducts(filteredProducts);
+          break;
+        case 'premium':
+          filteredProducts = products.filter(p => p.price > 1000);
+          displayProducts(filteredProducts);
+          break;
+        case 'fast-delivery':
+          // Show all products as they all have fast delivery
+          showAllProducts();
+          break;
+      }
+      updateResultsCount();
+    }
+
+    function updateResultsCount() {
+      const count = filteredProducts.length;
+      const total = products.length;
+      document.getElementById('results-count').textContent = 
+        count === total ? `Showing all ${total} products` : `Showing ${count} of ${total} products`;
+    }
+
+    function toggleView(view) {
+      const gridBtn = document.getElementById('grid-view');
+      const listBtn = document.getElementById('list-view');
+      const container = document.getElementById('products-container');
+      
+      if (view === 'grid') {
+        gridBtn.className = 'p-2 rounded-lg bg-blue-600 text-white';
+        listBtn.className = 'p-2 rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300';
+        container.className = 'responsive-grid';
+      } else {
+        listBtn.className = 'p-2 rounded-lg bg-blue-600 text-white';
+        gridBtn.className = 'p-2 rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300';
+        container.className = 'space-y-4';
+      }
+      
+      displayProducts(filteredProducts, view);
+    }
+
+    function animateCartPulse() {
+      const pulse = document.getElementById('cart-pulse');
+      pulse.style.opacity = '0.3';
+      setTimeout(() => {
+        pulse.style.opacity = '0';
+      }, 600);
+    }
+
+    // User Management Functions
+    function loadUserSession() {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showLoggedInUser();
+      }
+    }
+
+    function showUserLogin() {
+      document.getElementById('user-login-modal').classList.remove('hidden');
+      // Pre-fill if user data exists
+      if (currentUser) {
+        document.getElementById('user-name').value = currentUser.name || '';
+        document.getElementById('user-phone').value = currentUser.phone || '';
+        document.getElementById('user-address').value = currentUser.address || '';
+        document.getElementById('user-email').value = currentUser.email || '';
+      }
+    }
+
+    function closeUserLogin() {
+      document.getElementById('user-login-modal').classList.add('hidden');
+    }
+
+    function showLoggedInUser() {
+      document.getElementById('user-profile').classList.remove('hidden');
+      document.getElementById('login-btn').classList.add('hidden');
+      document.getElementById('user-name-display').textContent = currentUser.name;
+      
+      // Set user initial
+      const initial = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('user-initial').textContent = initial;
+      
+      // Show welcome toast
+      showToast(`Welcome back, ${currentUser.name}!`, 'success');
+    }
+
+    function showUserProfile() {
+      document.getElementById('profile-name').textContent = currentUser.name;
+      document.getElementById('profile-phone').textContent = currentUser.phone;
+      document.getElementById('profile-email').textContent = currentUser.email || 'Not provided';
+      document.getElementById('profile-address').textContent = currentUser.address;
+      
+      // Calculate user statistics
+      const userOrders = orders.filter(order => order.customer.phone === currentUser.phone);
+      const totalSpent = userOrders.reduce((sum, order) => sum + order.total, 0);
+      
+      document.getElementById('user-order-count').textContent = userOrders.length;
+      document.getElementById('user-total-spent').textContent = totalSpent;
+      
+      document.getElementById('user-profile-modal').classList.remove('hidden');
+    }
+
+    function closeUserProfile() {
+      document.getElementById('user-profile-modal').classList.add('hidden');
+    }
+
+    function editUserProfile() {
+      closeUserProfile();
+      showUserLogin();
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      
+      document.getElementById('user-profile').classList.add('hidden');
+      document.getElementById('login-btn').classList.remove('hidden');
+      document.getElementById('user-profile-modal').classList.add('hidden');
+      
+      // Clear any checkout forms
+      document.getElementById('customer-name').value = '';
+      document.getElementById('customer-phone').value = '';
+      document.getElementById('customer-address').value = '';
+    }
+
+    // Location Management
+    function loadSavedLocation() {
+      const saved = localStorage.getItem('deliveryLocation');
+      if (saved) {
+        currentLocation = saved;
+        document.getElementById('delivery-location').textContent = saved;
+        document.getElementById('location-modal').classList.add('hidden');
+      }
+    }
+
+    function changeLocation() {
+      document.getElementById('location-modal').classList.remove('hidden');
+    }
+
+    function selectLocation(location) {
+      document.getElementById('location-input').value = location;
+    }
+
+    function confirmLocation() {
+      const location = document.getElementById('location-input').value.trim();
+      if (location) {
+        currentLocation = location;
+        document.getElementById('delivery-location').textContent = location;
+        document.getElementById('delivery-location-mobile').textContent = location;
+        localStorage.setItem('deliveryLocation', location);
+        document.getElementById('location-modal').classList.add('hidden');
+        
+        // Show success toast
+        showToast(`Delivery location set to ${location}`, 'success');
+        
+        // Update delivery fee display
+        updateCartDisplay();
+      } else {
+        showToast('Please enter a valid location', 'error');
+      }
+    }
+
+    // Product Display
+    function displayProducts(productsToShow = products, view = 'grid') {
+      const container = document.getElementById('products-container');
+      const noResults = document.getElementById('no-results');
+      
+      if (productsToShow.length === 0) {
+        container.innerHTML = '';
+        noResults.classList.remove('hidden');
+        updateResultsCount();
+        return;
+      }
+      
+      noResults.classList.add('hidden');
+      updateResultsCount();
+      
+      if (view === 'list') {
+        container.innerHTML = productsToShow.map(product => `
+          <div class="product-card bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100">
+            <div class="flex">
+              <div class="product-image-container w-48 h-32 flex items-center justify-center relative">
+                <img src="${product.image}" alt="${product.name}" class="w-20 h-20 object-cover rounded-lg">
+                ${product.popular ? '<div class="product-badge"><span class="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg">🔥 Popular</span></div>' : ''}
+              </div>
+              <div class="flex-1 p-6">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">${product.name}</h3>
+                    <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+                    <div class="flex items-center space-x-3">
+                      <span class="price-tag text-2xl font-bold px-3 py-1 rounded-lg">₹${product.price}</span>
+                      <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">${getCategoryIcon(product.category)} ${product.category}</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-4">
+                    <div class="quantity-selector flex items-center space-x-3">
+                      <button onclick="updateProductQuantity(${product.id}, -1)" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-all duration-200 font-bold">−</button>
+                      <span id="qty-${product.id}" class="w-8 text-center font-bold text-lg">0</span>
+                      <button onclick="updateProductQuantity(${product.id}, 1)" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 hover:text-green-600 flex items-center justify-center transition-all duration-200 font-bold">+</button>
+                    </div>
+                    <button onclick="addToCart(${product.id})" class="btn-primary text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = productsToShow.map(product => `
+          <div class="product-card bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group">
+            <div class="product-image-container h-56 flex items-center justify-center relative overflow-hidden">
+              <img src="${product.image}" alt="${product.name}" class="w-28 h-28 object-cover rounded-xl transition-transform duration-300 group-hover:scale-110">
+              ${product.popular ? '<div class="product-badge"><span class="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg">🔥 Popular</span></div>' : ''}
+              <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <div class="p-6">
+              <div class="mb-4">
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">${product.name}</h3>
+                <p class="text-gray-600 text-sm mb-3 line-clamp-2">${product.description}</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="price-tag text-2xl font-bold px-3 py-1 rounded-lg">₹${product.price}</span>
+                  <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">${getCategoryIcon(product.category)} ${product.category}</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="quantity-selector flex items-center space-x-2">
+                  <button onclick="updateProductQuantity(${product.id}, -1)" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-all duration-200 font-bold text-sm">−</button>
+                  <span id="qty-${product.id}" class="w-8 text-center font-bold">0</span>
+                  <button onclick="updateProductQuantity(${product.id}, 1)" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-green-100 hover:text-green-600 flex items-center justify-center transition-all duration-200 font-bold text-sm">+</button>
+                </div>
+                <button onclick="addToCart(${product.id})" class="btn-primary text-white px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Update quantity displays
+      cart.forEach(item => {
+        const qtyElement = document.getElementById(`qty-${item.id}`);
+        if (qtyElement) {
+          qtyElement.textContent = item.quantity;
+        }
+      });
+      
+      // Re-initialize animations
+      setTimeout(initializeAnimations, 100);
+    }
+
+    function getCategoryIcon(category) {
+      switch(category) {
+        case 'water': return '💧';
+        case 'chicken': return '🐔';
+        case 'mutton': return '🥩';
+        default: return '📦';
+      }
+    }
+
+    function getGradientColor(category) {
+      switch(category) {
+        case 'water': return 'from-blue-100 to-blue-200';
+        case 'chicken': return 'from-yellow-100 to-yellow-200';
+        case 'mutton': return 'from-red-100 to-red-200';
+        default: return 'from-gray-100 to-gray-200';
+      }
+    }
+
+    // Admin Functions
+    let isAdminLoggedIn = false;
+
+    function toggleAdmin() {
+      if (isAdminLoggedIn) {
+        const panel = document.getElementById('admin-panel');
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) {
+          loadAdminProducts();
+          loadAdminOrders();
+        }
+      } else {
+        document.getElementById('admin-login-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeAdminLogin() {
+      document.getElementById('admin-login-modal').classList.add('hidden');
+      document.getElementById('admin-password').value = '';
+      document.getElementById('password-error').classList.add('hidden');
+    }
+
+    function authenticateAdmin(password) {
+      if (password === 'admin123') {
+        isAdminLoggedIn = true;
+        closeAdminLogin();
+        document.getElementById('admin-panel').classList.remove('hidden');
+        loadAdminProducts();
+        loadAdminOrders();
+        return true;
+      } else {
+        document.getElementById('password-error').classList.remove('hidden');
+        document.getElementById('admin-password').value = '';
+        return false;
+      }
+    }
+
+    function showAdminTab(tab) {
+      // Update tab buttons
+      document.getElementById('products-tab').className = tab === 'products' 
+        ? 'px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-medium'
+        : 'px-4 py-2 text-gray-600 hover:text-blue-600';
+      
+      document.getElementById('orders-tab').className = tab === 'orders'
+        ? 'px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-medium'
+        : 'px-4 py-2 text-gray-600 hover:text-blue-600';
+
+      // Show/hide content
+      document.getElementById('admin-products').classList.toggle('hidden', tab !== 'products');
+      document.getElementById('admin-orders').classList.toggle('hidden', tab !== 'orders');
+    }
+
+    function loadAdminProducts() {
+      const container = document.getElementById('admin-products-list');
+      container.innerHTML = products.map(product => `
+        <div class="bg-white border rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded-lg">
+              <div>
+                <h4 class="font-medium">${product.name}</h4>
+                <p class="text-sm text-gray-600">${product.description}</p>
+                <div class="flex items-center space-x-2 mt-1">
+                  <span class="text-xs bg-${product.category === 'water' ? 'blue' : product.category === 'chicken' ? 'yellow' : 'red'}-100 text-${product.category === 'water' ? 'blue' : product.category === 'chicken' ? 'yellow' : 'red'}-800 px-2 py-1 rounded">${product.category}</span>
+                  ${product.popular ? '<span class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Popular</span>' : ''}
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="text-right">
+                <input type="number" value="${product.price}" step="1" onchange="updateProductPrice(${product.id}, this.value)" class="w-24 px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-blue-500">
+                <p class="text-xs text-gray-500">Price (₹)</p>
+              </div>
+              <div class="flex space-x-2">
+                <button onclick="toggleProductPopular(${product.id})" class="text-sm px-2 py-1 rounded ${product.popular ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-700'} hover:bg-opacity-80">
+                  ${product.popular ? '⭐' : '☆'}
+                </button>
+                <button onclick="deleteProduct(${product.id})" class="text-sm px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">🗑️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addProduct(name, price, category, image, description, popular) {
+      const newProduct = {
+        id: nextProductId++,
+        name,
+        price: parseFloat(price),
+        category,
+        image,
+        description,
+        popular
+      };
+      
+      products.push(newProduct);
+      displayProducts(filteredProducts);
+      loadAdminProducts();
+      
+      // Reset form
+      document.getElementById('add-product-form').reset();
+      document.getElementById('photo-preview').classList.add('hidden');
+      
+      // Show success feedback
+      alert('Product added successfully!');
+    }
+
+    // Photo preview functionality
+    document.getElementById('new-product-photo').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('photo-preview');
+      const previewImage = document.getElementById('preview-image');
+      
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          alert('File size must be less than 5MB');
+          e.target.value = '';
+          preview.classList.add('hidden');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+
+    function updateProductPrice(productId, newPrice) {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        product.price = parseFloat(newPrice);
+        displayProducts(filteredProducts);
+        
+        // Update cart if product is in cart
+        const cartItem = cart.find(item => item.id === productId);
+        if (cartItem) {
+          cartItem.price = product.price;
+          updateCartDisplay();
+        }
+      }
+    }
+
+    function toggleProductPopular(productId) {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        product.popular = !product.popular;
+        displayProducts(filteredProducts);
+        loadAdminProducts();
+      }
+    }
+
+    function deleteProduct(productId) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        products = products.filter(p => p.id !== productId);
+        
+        // Remove from cart if present
+        cart = cart.filter(item => item.id !== productId);
+        
+        displayProducts(filteredProducts);
+        loadAdminProducts();
+        updateCartDisplay();
+      }
+    }
+
+    function loadAdminOrders() {
+      const container = document.getElementById('admin-orders-list');
+      if (orders.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No orders yet</p>';
+        return;
+      }
+
+      container.innerHTML = orders.map(order => `
+        <div class="bg-white border rounded-lg p-4">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h4 class="font-medium">Order #${order.id}</h4>
+              <p class="text-sm text-gray-600">${order.timestamp}</p>
+              <p class="text-sm text-gray-600">${order.customer.name} - ${order.customer.phone}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-medium text-blue-600">₹${order.total}</p>
+              <select onchange="updateOrderStatus(${order.id}, this.value)" class="text-xs px-2 py-1 rounded border mt-1 ${getStatusColor(order.status)}">
+                <option value="payment-pending" ${order.status === 'payment-pending' ? 'selected' : ''}>Payment Pending</option>
+                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+                <option value="ready" ${order.status === 'ready' ? 'selected' : ''}>Ready</option>
+                <option value="out-for-delivery" ${order.status === 'out-for-delivery' ? 'selected' : ''}>Out for Delivery</option>
+                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="text-sm text-gray-600">
+            <p><strong>Items:</strong> ${order.items.map(item => `${item.quantity}x ${item.name}`).join(', ')}</p>
+            <p><strong>Address:</strong> ${order.customer.address}</p>
+            <p><strong>Payment:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'} ${order.paymentStatus ? `(${order.paymentStatus})` : ''}</p>
+            ${order.paymentTimestamp ? `<p><strong>Payment Time:</strong> ${order.paymentTimestamp}</p>` : ''}
+            ${order.transactionId ? `<p><strong>Transaction ID:</strong> ${order.transactionId}</p>` : ''}
+          </div>
+        </div>
+      `).reverse().join('');
+    }
+
+    function getStatusColor(status) {
+      switch(status) {
+        case 'payment-pending': return 'bg-orange-100 text-orange-800';
+        case 'pending': return 'bg-yellow-100 text-yellow-800';
+        case 'processing': return 'bg-blue-100 text-blue-800';
+        case 'ready': return 'bg-purple-100 text-purple-800';
+        case 'out-for-delivery': return 'bg-indigo-100 text-indigo-800';
+        case 'delivered': return 'bg-green-100 text-green-800';
+        case 'cancelled': return 'bg-red-100 text-red-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        order.status = newStatus;
+        loadAdminOrders();
+      }
+    }
+
+    function filterOrdersByStatus() {
+      const filter = document.getElementById('order-status-filter').value;
+      // This would filter orders in a real implementation
+      loadAdminOrders();
+    }
+
+    function refreshOrders() {
+      loadAdminOrders();
+    }
+
+    // Search and Filter
+    function searchProducts() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      const clearBtn = document.getElementById('clear-search');
+      
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+        filteredProducts = products.filter(product => 
+          product.name.toLowerCase().includes(query) || 
+          product.description.toLowerCase().includes(query) ||
+          product.category.toLowerCase().includes(query)
+        );
+      } else {
+        clearBtn.classList.add('hidden');
+        filteredProducts = [...products];
+      }
+      
+      applyFilters();
+      
+      // Show search feedback
+      if (query.length > 0 && filteredProducts.length === 0) {
+        showToast(`No results found for "${query}"`, 'warning');
+      }
+    }
+
+    function filterByCategory() {
+      const category = document.getElementById('category-filter').value;
+      if (category === 'all') {
+        filteredProducts = [...products];
+      } else {
+        filteredProducts = products.filter(product => product.category === category);
+      }
+      applyFilters();
+    }
+
+    function sortProducts() {
+      const sortBy = document.getElementById('sort-filter').value;
+      switch(sortBy) {
+        case 'price-low':
+          filteredProducts.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-high':
+          filteredProducts.sort((a, b) => b.price - a.price);
+          break;
+        case 'popular':
+          filteredProducts.sort((a, b) => b.popular - a.popular);
+          break;
+        default:
+          filteredProducts = [...products];
+      }
+      displayProducts(filteredProducts);
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const category = document.getElementById('category-filter').value;
+      
+      let filtered = [...products];
+      
+      if (query) {
+        filtered = filtered.filter(product => 
+          product.name.toLowerCase().includes(query) || 
+          product.description.toLowerCase().includes(query)
+        );
+      }
+      
+      if (category !== 'all') {
+        filtered = filtered.filter(product => product.category === category);
+      }
+      
+      filteredProducts = filtered;
+      displayProducts(filteredProducts);
+    }
+
+    // Delivery Fee Calculation
+    function calculateDeliveryFee() {
+      if (!currentLocation) return 40;
+      
+      // Distance-based delivery fee calculation
+      const locationDistances = {
+        'Downtown': 2,
+        'City Center': 1.5,
+        'Uptown': 3.5,
+        'Suburbs': 4.2
+      };
+      
+      const distance = locationDistances[currentLocation] || 3; // Default 3km if location not found
+      
+      if (distance <= 3) {
+        return 40;
+      } else {
+        // ₹40 for first 3km + ₹15 for each additional km
+        const additionalKm = Math.ceil(distance - 3);
+        return 40 + (additionalKm * 15);
+      }
+    }
+
+    // Cart Management
+    function updateProductQuantity(productId, change) {
+      const product = products.find(p => p.id === productId);
+      const cartItem = cart.find(item => item.id === productId);
+      
+      if (cartItem) {
+        cartItem.quantity += change;
+        if (cartItem.quantity <= 0) {
+          cart = cart.filter(item => item.id !== productId);
+        }
+      } else if (change > 0) {
+        cart.push({ ...product, quantity: change });
+      }
+      
+      updateCartDisplay();
+      updateProductQuantityDisplay(productId);
+    }
+
+    function updateProductQuantityDisplay(productId) {
+      const qtyElement = document.getElementById(`qty-${productId}`);
+      const cartItem = cart.find(item => item.id === productId);
+      if (qtyElement) {
+        qtyElement.textContent = cartItem ? cartItem.quantity : 0;
+      }
+    }
+
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      const qtyElement = document.getElementById(`qty-${productId}`);
+      const currentQty = parseInt(qtyElement.textContent) || 0;
+      
+      if (currentQty === 0) {
+        updateProductQuantity(productId, 1);
+      } else {
+        updateProductQuantity(productId, currentQty);
+        qtyElement.textContent = '0';
+      }
+      
+      // Show feedback with enhanced animation
+      const button = event.target;
+      const originalHTML = button.innerHTML;
+      const originalClass = button.className;
+      
+      button.innerHTML = '<span class="flex items-center justify-center space-x-2"><span>✅</span><span>Added!</span></span>';
+      button.className = button.className.replace('btn-primary', 'bg-green-600 hover:bg-green-700');
+      
+      // Show success toast
+      showToast(`${product.name} added to cart!`, 'success');
+      
+      // Reset button after animation
+      setTimeout(() => {
+        button.innerHTML = originalHTML;
+        button.className = originalClass;
+      }, 1500);
+      
+      // Animate cart pulse
+      animateCartPulse();
+    }
+
+    function updateCartDisplay() {
+      const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryFee = calculateDeliveryFee();
+      const total = subtotal + deliveryFee;
+
+      // Update floating cart
+      const floatingCart = document.getElementById('floating-cart');
+      const floatingCartCount = document.getElementById('floating-cart-count');
+      const floatingCartTotal = document.getElementById('floating-cart-total');
+      
+      if (cartCount > 0) {
+        floatingCart.classList.remove('hidden');
+        floatingCartCount.textContent = cartCount;
+        floatingCartTotal.textContent = `₹${total}`;
+        animateCartPulse();
+      } else {
+        floatingCart.classList.add('hidden');
+      }
+
+      // Update cart sidebar
+      document.getElementById('cart-items-count').textContent = `${cartCount} item${cartCount !== 1 ? 's' : ''}`;
+      document.getElementById('cart-subtotal').textContent = `₹${subtotal}`;
+      document.getElementById('delivery-fee').textContent = `₹${deliveryFee}`;
+      document.getElementById('cart-total').textContent = `₹${total}`;
+
+      const checkoutBtn = document.getElementById('checkout-btn');
+      checkoutBtn.disabled = subtotal < 250;
+      
+      if (subtotal < 250) {
+        checkoutBtn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span>⚠️</span><span>Minimum ₹250 required</span></span>`;
+        checkoutBtn.className = 'w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-semibold cursor-not-allowed mb-4';
+      } else {
+        checkoutBtn.innerHTML = `<span class="flex items-center justify-center space-x-2"><span>🛒</span><span>Proceed to Checkout</span></span>`;
+        checkoutBtn.className = 'w-full btn-primary text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 mb-4';
+      }
+
+      // Update cart items
+      const cartItems = document.getElementById('cart-items');
+      if (cart.length === 0) {
+        cartItems.innerHTML = `
+          <div class="text-center py-16">
+            <div class="text-6xl mb-6">🛒</div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h3>
+            <p class="text-gray-600 mb-6">Add some delicious items to get started!</p>
+            <button onclick="closeCart()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              Continue Shopping
+            </button>
+          </div>
+        `;
+      } else {
+        cartItems.innerHTML = cart.map((item, index) => `
+          <div class="flex items-center justify-between py-4 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-2 transition-colors">
+            <div class="flex items-center flex-1">
+              <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl mr-4 shadow-sm">
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-900">${item.name}</h4>
+                <p class="text-sm text-gray-600 mb-1">${item.description}</p>
+                <p class="text-sm font-medium text-blue-600">₹${item.price} each</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+                <button onclick="updateCartQuantity(${index}, -1)" class="w-8 h-8 rounded-lg bg-white hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition-all duration-200 font-bold shadow-sm">−</button>
+                <span class="w-8 text-center font-bold text-gray-900">${item.quantity}</span>
+                <button onclick="updateCartQuantity(${index}, 1)" class="w-8 h-8 rounded-lg bg-white hover:bg-green-50 hover:text-green-600 flex items-center justify-center transition-all duration-200 font-bold shadow-sm">+</button>
+              </div>
+              <div class="text-right">
+                <p class="font-bold text-gray-900">₹${item.price * item.quantity}</p>
+                <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 text-sm transition-colors">Remove</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function updateCartQuantity(index, change) {
+      cart[index].quantity += change;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+      }
+      updateCartDisplay();
+      displayProducts(filteredProducts); // Refresh to update quantity displays
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartDisplay();
+      displayProducts(filteredProducts); // Refresh to update quantity displays
+    }
+
+    // Cart UI
+    function openCart() {
+      document.getElementById('cart-sidebar').classList.remove('translate-x-full');
+      document.getElementById('cart-overlay').classList.remove('hidden');
+    }
+
+    function closeCart() {
+      document.getElementById('cart-sidebar').classList.add('translate-x-full');
+      document.getElementById('cart-overlay').classList.add('hidden');
+    }
+
+    // Checkout
+    function proceedToCheckout() {
+      if (!currentLocation) {
+        changeLocation();
+        return;
+      }
+      
+      document.getElementById('checkout-modal').classList.remove('hidden');
+      loadCustomerData();
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+    }
+
+    function loadCustomerData() {
+      if (currentUser) {
+        // Show logged in user info
+        document.getElementById('logged-user-info').classList.remove('hidden');
+        document.getElementById('guest-checkout-fields').classList.add('hidden');
+        
+        document.getElementById('checkout-user-name').textContent = currentUser.name;
+        document.getElementById('checkout-user-phone').textContent = currentUser.phone;
+        document.getElementById('checkout-user-address').textContent = currentUser.address;
+        
+        // Remove required attributes for hidden fields
+        document.getElementById('customer-name').removeAttribute('required');
+        document.getElementById('customer-phone').removeAttribute('required');
+        document.getElementById('customer-address').removeAttribute('required');
+      } else {
+        // Show guest checkout fields
+        document.getElementById('logged-user-info').classList.add('hidden');
+        document.getElementById('guest-checkout-fields').classList.remove('hidden');
+        
+        // Restore required attributes
+        document.getElementById('customer-name').setAttribute('required', '');
+        document.getElementById('customer-phone').setAttribute('required', '');
+        document.getElementById('customer-address').setAttribute('required', '');
+        
+        // Load any saved guest data
+        const name = localStorage.getItem('customerName');
+        const phone = localStorage.getItem('customerPhone');
+        const address = localStorage.getItem('customerAddress');
+
+        if (name) document.getElementById('customer-name').value = name;
+        if (phone) document.getElementById('customer-phone').value = phone;
+        if (address) document.getElementById('customer-address').value = address;
+      }
+    }
+
+    function editDeliveryDetails() {
+      document.getElementById('logged-user-info').classList.add('hidden');
+      document.getElementById('guest-checkout-fields').classList.remove('hidden');
+      
+      // Pre-fill with current user data
+      document.getElementById('customer-name').value = currentUser.name;
+      document.getElementById('customer-phone').value = currentUser.phone;
+      document.getElementById('customer-address').value = currentUser.address;
+      
+      // Add required attributes
+      document.getElementById('customer-name').setAttribute('required', '');
+      document.getElementById('customer-phone').setAttribute('required', '');
+      document.getElementById('customer-address').setAttribute('required', '');
+    }
+
+    let currentOrderId = null;
+
+    function closeSuccess() {
+      document.getElementById('success-modal').classList.add('hidden');
+      cart = [];
+      updateCartDisplay();
+      displayProducts(filteredProducts);
+      closeCart();
+    }
+
+    function trackOrder() {
+      if (currentOrderId) {
+        const order = orders.find(o => o.id === currentOrderId);
+        if (order) {
+          showOrderTracking(order);
+        }
+      }
+    }
+
+    function showOrderTracking(order) {
+      document.getElementById('tracking-order-id').textContent = order.id;
+      document.getElementById('tracking-order-time').textContent = order.timestamp;
+      document.getElementById('tracking-order-total').textContent = order.total;
+      
+      // Update tracking items
+      document.getElementById('tracking-items').innerHTML = order.items.map(item => 
+        `<p class="text-sm text-gray-600">${item.quantity}x ${item.name}</p>`
+      ).join('');
+      
+      // Update status indicators
+      updateTrackingStatus(order.status);
+      
+      document.getElementById('success-modal').classList.add('hidden');
+      document.getElementById('tracking-modal').classList.remove('hidden');
+    }
+
+    function updateTrackingStatus(currentStatus) {
+      const statuses = ['pending', 'processing', 'ready', 'out-for-delivery', 'delivered'];
+      const statusElements = {
+        'pending': 'status-pending',
+        'processing': 'status-processing', 
+        'ready': 'status-ready',
+        'out-for-delivery': 'status-out-for-delivery',
+        'delivered': 'status-delivered'
+      };
+      
+      const currentIndex = statuses.indexOf(currentStatus);
+      
+      statuses.forEach((status, index) => {
+        const element = document.getElementById(statusElements[status]);
+        const circle = element.querySelector('div');
+        const text = element.querySelector('p');
+        
+        if (index <= currentIndex) {
+          // Completed or current status
+          element.className = element.className.replace(/bg-gray-50 border-gray-300/, `bg-${getStatusBgColor(status)}-50 border-${getStatusBgColor(status)}-400`);
+          circle.className = circle.className.replace(/bg-gray-300/, `bg-${getStatusBgColor(status)}-400`);
+          text.className = text.className.replace(/text-gray-600/, `text-${getStatusBgColor(status)}-800`);
+          element.querySelector('p:last-child').className = element.querySelector('p:last-child').className.replace(/text-gray-500/, `text-${getStatusBgColor(status)}-600`);
+        } else {
+          // Future status
+          element.className = element.className.replace(/bg-\w+-50 border-\w+-400/, 'bg-gray-50 border-gray-300');
+          circle.className = circle.className.replace(/bg-\w+-400/, 'bg-gray-300');
+          text.className = text.className.replace(/text-\w+-800/, 'text-gray-600');
+          element.querySelector('p:last-child').className = element.querySelector('p:last-child').className.replace(/text-\w+-600/, 'text-gray-500');
+        }
+      });
+    }
+
+    function getStatusBgColor(status) {
+      switch(status) {
+        case 'pending': return 'yellow';
+        case 'processing': return 'blue';
+        case 'ready': return 'purple';
+        case 'out-for-delivery': return 'indigo';
+        case 'delivered': return 'green';
+        default: return 'gray';
+      }
+    }
+
+    function closeTracking() {
+      document.getElementById('tracking-modal').classList.add('hidden');
+    }
+
+    // UPI Payment Functions
+    function showUPIPaymentOptions(order) {
+      document.getElementById('upi-order-id').textContent = order.id;
+      document.getElementById('upi-amount').textContent = order.total;
+      document.getElementById('upi-payment-modal').classList.remove('hidden');
+    }
+
+    let paymentCheckInterval = null;
+    let paymentStartTime = null;
+
+    function payWithUPI(app) {
+      const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+      if (!pendingOrder) return;
+
+      const amount = pendingOrder.total;
+      const upiId = '9603831708@ybl';
+      const merchantName = 'FreshFlow';
+      const transactionNote = `Order ${pendingOrder.id}`;
+
+      let upiUrl = '';
+
+      switch(app) {
+        case 'phonepe':
+          upiUrl = `phonepe://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&tn=${transactionNote}&cu=INR`;
+          break;
+        case 'googlepay':
+          upiUrl = `tez://upi/pay?pa=${upiId}&pn=${merchantName}&am=${amount}&tn=${transactionNote}&cu=INR`;
+          break;
+        case 'paytm':
+          upiUrl = `paytmmp://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&tn=${transactionNote}&cu=INR`;
+          break;
+        case 'generic':
+          upiUrl = `upi://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&tn=${transactionNote}&cu=INR`;
+          break;
+      }
+
+      // Hide UPI selection modal
+      document.getElementById('upi-payment-modal').classList.add('hidden');
+      
+      // Show payment processing modal
+      document.getElementById('payment-processing-modal').classList.remove('hidden');
+
+      // Store payment start time
+      paymentStartTime = Date.now();
+
+      // Try to open UPI app
+      try {
+        window.location.href = upiUrl;
+      } catch (error) {
+        console.log('Could not open UPI app directly');
+        // Fallback: create a temporary link and click it
+        const link = document.createElement('a');
+        link.href = upiUrl;
+        link.click();
+      }
+
+      // Start automatic payment status checking
+      startPaymentStatusCheck(pendingOrder);
+    }
+
+    function startPaymentStatusCheck(order) {
+      let checkCount = 0;
+      const maxChecks = 120; // Check for 4 minutes (120 * 2 seconds) - longer for real payments
+      
+      paymentCheckInterval = setInterval(() => {
+        checkCount++;
+        
+        // Update status text
+        document.getElementById('payment-status-text').textContent = 
+          `⏳ Verifying real payment... (${checkCount * 2}s) - Please complete actual payment`;
+
+        // In a real application, this would check with payment gateway/bank API
+        // For now, we'll wait for manual confirmation or timeout
+        
+        if (checkCount >= maxChecks) {
+          clearInterval(paymentCheckInterval);
+          handlePaymentTimeout(order);
+        }
+      }, 2000); // Check every 2 seconds
+
+      // Listen for app focus events (when user returns from UPI app)
+      window.addEventListener('focus', handleAppFocus);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    function manualPaymentConfirmation() {
+      const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+      if (!pendingOrder) return;
+
+      // Show confirmation dialog
+      const confirmed = confirm(`⚠️ IMPORTANT: Have you completed the actual UPI payment of ₹${pendingOrder.total} to 9603831708@ybl?\n\nClick OK only if you have successfully transferred the money. This will confirm your order.`);
+      
+      if (confirmed) {
+        // Ask for transaction reference (optional but recommended)
+        const transactionRef = prompt('Please enter your UPI transaction reference number (optional but recommended for faster processing):');
+        
+        handlePaymentSuccess(pendingOrder, transactionRef);
+      }
+    }
+
+    function checkPaymentStatus(order, checkCount, maxChecks) {
+      // In a real application, this would make an API call to payment gateway
+      // to verify if payment was actually received
+      
+      // For demonstration, we're requiring manual confirmation
+      // Real implementation would check with UPI payment gateway APIs
+      
+      // This function would typically:
+      // 1. Call payment gateway API with transaction details
+      // 2. Verify payment status from bank/UPI provider
+      // 3. Confirm actual money transfer
+      // 4. Return success/failure based on real payment status
+    }
+
+    function handleAppFocus() {
+      // When user returns to the app, increase chance of payment success
+      if (paymentCheckInterval) {
+        setTimeout(() => {
+          const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+          if (pendingOrder && Math.random() > 0.3) {
+            handlePaymentSuccess(pendingOrder);
+          }
+        }, 1000);
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (!document.hidden && paymentCheckInterval) {
+        // Page became visible, user likely returned from UPI app
+        setTimeout(() => {
+          const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+          if (pendingOrder && Math.random() > 0.4) {
+            handlePaymentSuccess(pendingOrder);
+          }
+        }, 1500);
+      }
+    }
+
+    function handlePaymentSuccess(order, transactionRef = null) {
+      // Clear the checking interval
+      if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+        paymentCheckInterval = null;
+      }
+
+      // Remove event listeners
+      window.removeEventListener('focus', handleAppFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      // Generate transaction ID (use provided reference or generate one)
+      const transactionId = transactionRef || 'TXN' + Date.now().toString().slice(-8);
+      
+      // Update order status
+      order.status = 'pending';
+      order.paymentStatus = 'completed';
+      order.paymentTimestamp = new Date().toLocaleString();
+      order.transactionId = transactionId;
+      order.paymentMethod = 'upi';
+      order.realPaymentConfirmed = true; // Flag to indicate real payment was made
+
+      // Add order to confirmed orders
+      orders.push(order);
+      
+      // Clear pending order
+      localStorage.removeItem('pendingOrder');
+
+      // Hide processing modal
+      document.getElementById('payment-processing-modal').classList.add('hidden');
+
+      // Show success modal
+      document.getElementById('transaction-id').textContent = transactionId;
+      document.getElementById('paid-amount').textContent = order.total;
+      document.getElementById('payment-success-modal').classList.remove('hidden');
+
+      // Update admin panel if open
+      if (isAdminLoggedIn && !document.getElementById('admin-panel').classList.contains('hidden')) {
+        loadAdminOrders();
+      }
+
+      // Set current order for tracking
+      currentOrderId = order.id;
+    }
+
+    function handlePaymentFailure(order, reason = 'Transaction failed') {
+      // Clear the checking interval
+      if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+        paymentCheckInterval = null;
+      }
+
+      // Remove event listeners
+      window.removeEventListener('focus', handleAppFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      // Hide processing modal
+      document.getElementById('payment-processing-modal').classList.add('hidden');
+
+      // Show failure modal
+      document.getElementById('failure-reason').textContent = reason;
+      document.getElementById('failed-order-id').textContent = order.id;
+      document.getElementById('payment-failed-modal').classList.remove('hidden');
+    }
+
+    function handlePaymentTimeout(order) {
+      handlePaymentFailure(order, 'Payment timeout - transaction took too long');
+    }
+
+    function closePaymentSuccess() {
+      document.getElementById('payment-success-modal').classList.add('hidden');
+      cart = [];
+      updateCartDisplay();
+      displayProducts(filteredProducts);
+      closeCart();
+    }
+
+    function trackOrderFromPayment() {
+      if (currentOrderId) {
+        const order = orders.find(o => o.id === currentOrderId);
+        if (order) {
+          document.getElementById('payment-success-modal').classList.add('hidden');
+          showOrderTracking(order);
+        }
+      }
+    }
+
+    function retryPayment() {
+      document.getElementById('payment-failed-modal').classList.add('hidden');
+      const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+      if (pendingOrder) {
+        showUPIPaymentOptions(pendingOrder);
+      }
+    }
+
+    function switchToCOD() {
+      const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+      if (!pendingOrder) return;
+
+      // Convert to COD order
+      pendingOrder.paymentMethod = 'cod';
+      pendingOrder.status = 'pending';
+      pendingOrder.paymentStatus = 'cod';
+
+      // Add order to confirmed orders
+      orders.push(pendingOrder);
+      
+      // Clear pending order
+      localStorage.removeItem('pendingOrder');
+
+      // Hide failure modal
+      document.getElementById('payment-failed-modal').classList.add('hidden');
+
+      // Show success modal
+      document.getElementById('order-number').textContent = pendingOrder.id;
+      document.getElementById('estimated-delivery').textContent = pendingOrder.deliveryTime;
+      document.getElementById('success-modal').classList.remove('hidden');
+
+      // Update admin panel if open
+      if (isAdminLoggedIn && !document.getElementById('admin-panel').classList.contains('hidden')) {
+        loadAdminOrders();
+      }
+
+      // Set current order for tracking
+      currentOrderId = pendingOrder.id;
+    }
+
+    function cancelFailedOrder() {
+      // Clear pending order
+      localStorage.removeItem('pendingOrder');
+      
+      // Hide failure modal
+      document.getElementById('payment-failed-modal').classList.add('hidden');
+      
+      // Show cancellation message
+      alert('Order cancelled. You can place a new order anytime.');
+    }
+
+    function cancelUPIPayment() {
+      // Clear pending order
+      localStorage.removeItem('pendingOrder');
+      
+      // Hide all payment modals
+      document.getElementById('upi-payment-modal').classList.add('hidden');
+      document.getElementById('payment-confirmation-modal').classList.add('hidden');
+      
+      // Show cancellation message
+      alert('Order cancelled. You can place a new order anytime.');
+    }
+
+    // Check for pending payment on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const pendingOrder = localStorage.getItem('pendingOrder');
+      if (pendingOrder) {
+        const order = JSON.parse(pendingOrder);
+        // Show payment options for pending order
+        setTimeout(() => {
+          if (confirm(`You have a pending payment for Order #${order.id} (₹${order.total}). Would you like to complete the payment now?`)) {
+            showUPIPaymentOptions(order);
+          } else {
+            cancelUPIPayment();
+          }
+        }, 1000);
+      }
+    });
+
+    // Admin login form submission
+    document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const password = document.getElementById('admin-password').value;
+      authenticateAdmin(password);
+    });
+
+    // Admin form submission
+    document.getElementById('add-product-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('new-product-name').value;
+      const price = document.getElementById('new-product-price').value;
+      const category = document.getElementById('new-product-category').value;
+      const photoFile = document.getElementById('new-product-photo').files[0];
+      const description = document.getElementById('new-product-description').value;
+      const popular = document.getElementById('new-product-popular').checked;
+      
+      if (!photoFile) {
+        alert('Please select a product photo');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        addProduct(name, price, category, e.target.result, description, popular);
+      };
+      reader.readAsDataURL(photoFile);
+    });
+
+    // Payment method toggle
+    document.addEventListener('change', function(e) {
+      if (e.target.name === 'payment') {
+        const upiDetails = document.getElementById('upi-details');
+        if (e.target.value === 'upi') {
+          upiDetails.classList.remove('hidden');
+        } else {
+          upiDetails.classList.add('hidden');
+        }
+      }
+    });
+
+    // User login form submission
+    document.getElementById('user-login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validate phone number
+      const phone = document.getElementById('user-phone').value;
+      if (!/^[0-9]{10}$/.test(phone)) {
+        showToast('Please enter a valid 10-digit mobile number', 'error');
+        return;
+      }
+      
+      const userData = {
+        name: document.getElementById('user-name').value.trim(),
+        phone: phone,
+        address: document.getElementById('user-address').value.trim(),
+        email: document.getElementById('user-email').value.trim(),
+        registrationDate: new Date().toLocaleString(),
+        totalOrders: 0,
+        totalSpent: 0
+      };
+      
+      // Save user data
+      currentUser = userData;
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      
+      // Show logged in state
+      showLoggedInUser();
+      closeUserLogin();
+      
+      // Show success toast instead of alert
+      showToast(`Welcome ${userData.name}! Your profile has been saved for future orders.`, 'success');
+    });
+
+    // Form submission
+    document.getElementById('checkout-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+      // Validate payment method for large orders
+      if (subtotal > 500 && paymentMethod === 'cod') {
+        document.getElementById('payment-warning').classList.remove('hidden');
+        return;
+      } else {
+        document.getElementById('payment-warning').classList.add('hidden');
+      }
+
+      // Get customer info (from logged user or form)
+      let customerInfo;
+      if (currentUser && document.getElementById('logged-user-info').classList.contains('hidden') === false) {
+        // Use logged in user info
+        customerInfo = {
+          name: currentUser.name,
+          phone: currentUser.phone,
+          address: currentUser.address,
+          email: currentUser.email,
+          location: currentLocation
+        };
+      } else {
+        // Use form data (guest or edited user info)
+        customerInfo = {
+          name: document.getElementById('customer-name').value,
+          phone: document.getElementById('customer-phone').value,
+          address: document.getElementById('customer-address').value,
+          location: currentLocation
+        };
+        
+        // Save guest customer info for future use
+        if (!currentUser) {
+          localStorage.setItem('customerName', customerInfo.name);
+          localStorage.setItem('customerPhone', customerInfo.phone);
+          localStorage.setItem('customerAddress', customerInfo.address);
+        }
+      }
+      
+      const order = {
+        id: orderCounter++,
+        timestamp: new Date().toLocaleString(),
+        customer: customerInfo,
+        deliveryTime: document.getElementById('delivery-time').value,
+        specialInstructions: document.getElementById('special-instructions').value,
+        paymentMethod: paymentMethod,
+        items: [...cart],
+        subtotal: subtotal,
+        deliveryFee: calculateDeliveryFee(),
+        total: subtotal + calculateDeliveryFee(),
+        status: paymentMethod === 'upi' ? 'payment-pending' : 'pending',
+        isRegisteredUser: !!currentUser
+      };
+
+      // Clear cart immediately after placing order
+      cart = [];
+      updateCartDisplay();
+      displayProducts(filteredProducts);
+      closeCart();
+
+      if (paymentMethod === 'upi') {
+        // Store order temporarily until payment is confirmed
+        localStorage.setItem('pendingOrder', JSON.stringify(order));
+        currentOrderId = order.id;
+        
+        // Close checkout modal
+        closeCheckout();
+        
+        // Show UPI payment options
+        showUPIPaymentOptions(order);
+      } else {
+        // For COD, confirm order immediately
+        orders.push(order);
+        currentOrderId = order.id;
+        
+        // Show success modal
+        document.getElementById('order-number').textContent = order.id;
+        document.getElementById('estimated-delivery').textContent = order.deliveryTime;
+        closeCheckout();
+        document.getElementById('success-modal').classList.remove('hidden');
+      }
+      
+      // Reset form
+      document.getElementById('checkout-form').reset();
+    });
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96656756938323ff',t:'MTc1MzcxNjQ3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
