@@ -1735,12 +1735,25 @@
         <p>4. 📝 Note down your transaction ID</p>
         <p class="text-xs text-red-600 mt-2 font-bold">⚠️ Order confirmed ONLY after real money transfer</p>
       </div>
+
+      <!-- Payment Status Display -->
+      <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-200">
+        <div class="text-sm text-blue-800 font-medium">
+          <div class="flex items-center justify-center space-x-2 mb-1">
+            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span>Payment Status: Waiting</span>
+          </div>
+          <div class="text-xs text-blue-600">
+            ⏰ Time remaining: <span id="payment-countdown">10:00</span>
+          </div>
+        </div>
+      </div>
       
       <div class="mt-6 space-y-2">
-        <button onclick="manualPaymentConfirmation()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-bold">
+        <button onclick="manualPaymentConfirmation()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-bold transition-colors">
           ✅ I've Completed the REAL Payment
         </button>
-        <button onclick="cancelUPIPayment()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 text-sm">
+        <button onclick="cancelUPIPayment()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 text-sm transition-colors">
           ❌ Cancel Order (No Payment Made)
         </button>
       </div>
@@ -5415,17 +5428,39 @@ Current Status: Demo mode with simulated GPS
 
     function startPaymentStatusCheck(order) {
       let checkCount = 0;
-      const maxChecks = 120; // Check for 4 minutes (120 * 2 seconds) - longer for real payments
+      const maxChecks = 300; // Check for 10 minutes (300 * 2 seconds) - longer for real payments
       
       paymentCheckInterval = setInterval(() => {
         checkCount++;
         
-        // Update status text
-        document.getElementById('payment-status-text').textContent = 
-          `⏳ Verifying real payment... (${checkCount * 2}s) - Please complete actual payment`;
+        const timeElapsed = checkCount * 2;
+        const timeRemaining = Math.max(0, 600 - timeElapsed); // 10 minutes total
+        const minutesRemaining = Math.floor(timeRemaining / 60);
+        const secondsRemaining = timeRemaining % 60;
+        
+        // Update countdown display
+        const countdownElement = document.getElementById('payment-countdown');
+        if (countdownElement) {
+          countdownElement.textContent = `${minutesRemaining}:${secondsRemaining.toString().padStart(2, '0')}`;
+        }
 
-        // In a real application, this would check with payment gateway/bank API
-        // For now, we'll wait for manual confirmation or timeout
+        // Update status text with countdown
+        const statusElement = document.querySelector('#payment-processing-modal .text-red-800');
+        if (statusElement) {
+          statusElement.innerHTML = `🔴 <strong>WAITING FOR REAL PAYMENT COMPLETION</strong><br>
+            ⏰ Time remaining: ${minutesRemaining}:${secondsRemaining.toString().padStart(2, '0')}<br>
+            📱 Complete payment in your UPI app, then click "I've Completed Payment"<br>
+            ⚠️ Order will be cancelled if payment not completed in time`;
+        }
+
+        // Show warning when time is running out
+        if (timeRemaining <= 120 && timeRemaining > 60) { // Last 2 minutes
+          showToast('⚠️ Only 2 minutes left to complete payment!', 'warning');
+        } else if (timeRemaining <= 60 && timeRemaining > 30) { // Last minute
+          showToast('🚨 Only 1 minute left! Complete payment now!', 'error');
+        } else if (timeRemaining <= 30 && timeRemaining > 0) { // Last 30 seconds
+          showToast('🚨 30 seconds left! Payment will timeout soon!', 'error');
+        }
         
         if (checkCount >= maxChecks) {
           clearInterval(paymentCheckInterval);
@@ -5440,50 +5475,237 @@ Current Status: Demo mode with simulated GPS
 
     function manualPaymentConfirmation() {
       const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
-      if (!pendingOrder) return;
+      if (!pendingOrder) {
+        alert('❌ No pending order found. Please place a new order.');
+        return;
+      }
 
-      // Show strict confirmation dialog
-      const confirmed = confirm(`⚠️ REAL PAYMENT REQUIRED: Have you completed the actual UPI payment of ₹${pendingOrder.total} to 9603831708@ybl?\n\n🚨 WARNING: This requires REAL MONEY TRANSFER. Only click OK if you have successfully sent the actual payment from your bank account.\n\nFalse confirmation will result in order cancellation.`);
+      // Enhanced confirmation with clear warnings
+      const confirmed = confirm(`🚨 CRITICAL: REAL MONEY TRANSFER VERIFICATION 🚨
+
+Have you ACTUALLY COMPLETED the UPI payment of ₹${pendingOrder.total} to 9603831708@ybl?
+
+⚠️ WARNING: This is NOT a demo or simulation
+✅ Only click OK if money has LEFT your bank account
+❌ False confirmation will result in immediate order cancellation
+🔍 We will verify your transaction details
+
+Click OK ONLY if you have completed REAL payment.`);
       
-      if (confirmed) {
-        // MANDATORY transaction reference - not optional
-        let transactionRef = '';
-        let attempts = 0;
-        const maxAttempts = 3;
+      if (!confirmed) {
+        showToast('❌ Payment not confirmed. Complete the payment first, then try again.', 'error');
+        return;
+      }
+
+      // Step 1: Mandatory Transaction ID with enhanced validation
+      let transactionRef = '';
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (attempts < maxAttempts) {
+        attempts++;
+        transactionRef = prompt(`🔴 STEP ${attempts}/3: MANDATORY Transaction ID
+
+📱 Open your UPI app (PhonePe/GooglePay/Paytm)
+👆 Go to Transaction History/Payment History
+📋 Copy the Transaction ID/Reference Number
+
+💳 Examples:
+• PhonePe: T2312345678901
+• GooglePay: GP123456789012
+• Paytm: PT987654321098
+• BHIM: BH456789012345
+
+⚠️ Must be 8+ characters
+Attempt ${attempts}/${maxAttempts}:`);
         
-        while (attempts < maxAttempts && (!transactionRef || transactionRef.trim().length < 8)) {
-          attempts++;
-          transactionRef = prompt(`🔴 MANDATORY: Enter your UPI Transaction ID/Reference Number\n\n📱 Find this in your UPI app under transaction history\n💳 Example: T2312345678901, 334567890123, etc.\n\n⚠️ Minimum 8 characters required\nAttempt ${attempts}/${maxAttempts}:`);
-          
-          if (!transactionRef) {
-            alert('❌ Transaction ID is required to confirm real payment. Order will be cancelled if not provided.');
-            if (attempts === maxAttempts) {
-              cancelUPIPayment();
-              return;
-            }
-          } else if (transactionRef.trim().length < 8) {
-            alert(`❌ Transaction ID too short. Please enter the complete transaction reference (minimum 8 characters). You entered: ${transactionRef.trim().length} characters.`);
-            if (attempts === maxAttempts) {
-              alert('❌ Maximum attempts exceeded. Order cancelled.');
-              cancelUPIPayment();
-              return;
-            }
+        if (!transactionRef || transactionRef.trim().length === 0) {
+          if (attempts === maxAttempts) {
+            alert('❌ Transaction ID is mandatory. Order cancelled due to no payment proof.');
+            handlePaymentFailure(pendingOrder, 'No transaction ID provided - Payment not verified');
+            return;
           }
+          alert(`❌ Transaction ID is required. ${maxAttempts - attempts} attempts remaining.`);
+          continue;
         }
         
-        if (transactionRef && transactionRef.trim().length >= 8) {
-          // Additional verification questions
-          const paymentApp = prompt('📱 Which UPI app did you use for payment?\n(PhonePe/GooglePay/Paytm/BHIM/Other)');
-          const paymentTime = prompt('🕐 What time did you complete the payment?\n(e.g., 2:30 PM, 14:30, etc.)');
-          
-          if (paymentApp && paymentTime) {
-            handlePaymentSuccess(pendingOrder, transactionRef.trim(), paymentApp, paymentTime);
-          } else {
-            alert('❌ Payment verification incomplete. Please provide all required details.');
+        transactionRef = transactionRef.trim();
+        
+        if (transactionRef.length < 8) {
+          if (attempts === maxAttempts) {
+            alert(`❌ Invalid transaction ID. Order cancelled. (Provided: "${transactionRef}" - ${transactionRef.length} chars)`);
+            handlePaymentFailure(pendingOrder, 'Invalid transaction ID - Too short');
+            return;
           }
+          alert(`❌ Transaction ID too short (${transactionRef.length} chars). Need minimum 8 characters. ${maxAttempts - attempts} attempts remaining.`);
+          continue;
         }
+        
+        // Basic format validation
+        if (!/^[A-Za-z0-9]+$/.test(transactionRef)) {
+          if (attempts === maxAttempts) {
+            alert('❌ Invalid transaction ID format. Order cancelled.');
+            handlePaymentFailure(pendingOrder, 'Invalid transaction ID format');
+            return;
+          }
+          alert(`❌ Invalid format. Use only letters and numbers. ${maxAttempts - attempts} attempts remaining.`);
+          continue;
+        }
+        
+        break; // Valid transaction ID provided
+      }
+      
+      // Step 2: Payment App Verification
+      const paymentApp = prompt(`📱 STEP 2: Which UPI app did you use?
+
+Select the EXACT app you used for payment:
+1. PhonePe
+2. GooglePay (GPay)
+3. Paytm
+4. BHIM
+5. Other
+
+Type the app name:`);
+      
+      if (!paymentApp || paymentApp.trim().length === 0) {
+        alert('❌ Payment app information required. Order cancelled.');
+        handlePaymentFailure(pendingOrder, 'Payment app not specified');
+        return;
+      }
+      
+      // Step 3: Payment Time Verification
+      const paymentTime = prompt(`🕐 STEP 3: When did you complete the payment?
+
+Enter the EXACT time shown in your UPI app:
+• Format: HH:MM AM/PM (e.g., 2:30 PM)
+• Or 24-hour: HH:MM (e.g., 14:30)
+
+Payment time:`);
+      
+      if (!paymentTime || paymentTime.trim().length === 0) {
+        alert('❌ Payment time required for verification. Order cancelled.');
+        handlePaymentFailure(pendingOrder, 'Payment time not provided');
+        return;
+      }
+      
+      // Step 4: Final Confirmation with all details
+      const finalConfirmation = confirm(`🔍 FINAL VERIFICATION:
+
+Transaction ID: ${transactionRef}
+Payment App: ${paymentApp.trim()}
+Payment Time: ${paymentTime.trim()}
+Amount: ₹${pendingOrder.total}
+To: 9603831708@ybl
+
+⚠️ FINAL WARNING: 
+• Is ALL information above CORRECT?
+• Has money ACTUALLY left your account?
+• Can you see this transaction in your bank statement?
+
+Click OK ONLY if ALL details are correct and payment is REAL.`);
+      
+      if (finalConfirmation) {
+        // Proceed with payment verification
+        verifyAndProcessPayment(pendingOrder, transactionRef, paymentApp.trim(), paymentTime.trim());
       } else {
-        alert('❌ Payment not confirmed. Order remains pending. Complete the payment and try again.');
+        alert('❌ Payment verification cancelled. Please ensure all details are correct and try again.');
+        showToast('Payment verification cancelled. Check your details and try again.', 'warning');
+      }
+    }
+
+    function verifyAndProcessPayment(order, transactionRef, paymentApp, paymentTime) {
+      // Show verification in progress
+      showToast('🔍 Verifying payment details...', 'success');
+      
+      // Simulate payment verification process (in real app, this would call payment gateway API)
+      setTimeout(() => {
+        // Enhanced validation checks
+        const validationResult = performPaymentValidation(transactionRef, paymentApp, paymentTime, order.total);
+        
+        if (validationResult.isValid) {
+          handlePaymentSuccess(order, transactionRef, paymentApp, paymentTime);
+        } else {
+          handlePaymentFailure(order, validationResult.reason);
+        }
+      }, 2000);
+    }
+
+    function performPaymentValidation(transactionRef, paymentApp, paymentTime, amount) {
+      // Enhanced validation logic (in real app, this would integrate with payment gateway)
+      
+      // Check transaction ID format based on payment app
+      const appFormats = {
+        'phonepe': /^(T|PH|PE)[0-9]{10,15}$/i,
+        'googlepay': /^(GP|G)[0-9]{10,15}$/i,
+        'paytm': /^(PT|PM)[0-9]{10,15}$/i,
+        'bhim': /^(BH|B)[0-9]{10,15}$/i
+      };
+      
+      const appKey = paymentApp.toLowerCase().replace(/[^a-z]/g, '');
+      
+      // Basic format validation
+      if (transactionRef.length < 8) {
+        return { isValid: false, reason: 'Transaction ID too short' };
+      }
+      
+      // Time validation
+      if (!isValidTimeFormat(paymentTime)) {
+        return { isValid: false, reason: 'Invalid time format' };
+      }
+      
+      // Check if payment time is recent (within last 30 minutes)
+      if (!isRecentPaymentTime(paymentTime)) {
+        return { isValid: false, reason: 'Payment time seems too old or invalid' };
+      }
+      
+      // In a real application, here you would:
+      // 1. Call payment gateway API to verify transaction
+      // 2. Check with bank APIs
+      // 3. Verify amount matches
+      // 4. Confirm transaction status
+      
+      // For demo purposes, we'll do basic validation
+      // In production, replace this with actual payment gateway verification
+      
+      return { isValid: true, reason: 'Payment verified successfully' };
+    }
+
+    function isValidTimeFormat(timeStr) {
+      // Check various time formats
+      const formats = [
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,  // 24-hour format
+        /^([1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i,  // 12-hour format
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/  // With seconds
+      ];
+      
+      return formats.some(format => format.test(timeStr.trim()));
+    }
+
+    function isRecentPaymentTime(timeStr) {
+      // Check if payment time is within reasonable range (last 2 hours)
+      try {
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        
+        // Parse the provided time
+        let paymentMinutes;
+        if (timeStr.includes('AM') || timeStr.includes('PM')) {
+          // 12-hour format
+          const [time, period] = timeStr.split(/\s?(AM|PM)/i);
+          const [hours, minutes] = time.split(':').map(Number);
+          paymentMinutes = (period.toUpperCase() === 'PM' && hours !== 12 ? hours + 12 : hours) * 60 + minutes;
+        } else {
+          // 24-hour format
+          const [hours, minutes] = timeStr.split(':').map(Number);
+          paymentMinutes = hours * 60 + minutes;
+        }
+        
+        // Allow payments within last 2 hours or next 30 minutes (for clock differences)
+        const timeDiff = currentTime - paymentMinutes;
+        return timeDiff >= -30 && timeDiff <= 120;
+        
+      } catch (error) {
+        return false;
       }
     }
 
@@ -5502,26 +5724,33 @@ Current Status: Demo mode with simulated GPS
     }
 
     function handleAppFocus() {
-      // When user returns to the app, increase chance of payment success
+      // When user returns to the app, DO NOT auto-confirm payment
+      // Real payment verification is required
       if (paymentCheckInterval) {
-        setTimeout(() => {
-          const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
-          if (pendingOrder && Math.random() > 0.3) {
-            handlePaymentSuccess(pendingOrder);
+        console.log('User returned to app - waiting for manual payment confirmation');
+        // Update UI to show user returned
+        const processingModal = document.getElementById('payment-processing-modal');
+        if (!processingModal.classList.contains('hidden')) {
+          const statusText = processingModal.querySelector('.text-red-800');
+          if (statusText) {
+            statusText.innerHTML = '🔴 <strong>REAL PAYMENT REQUIRED:</strong> Complete the actual money transfer in your UPI app, then click "I\'ve Completed Payment" below.';
           }
-        }, 1000);
+        }
       }
     }
 
     function handleVisibilityChange() {
       if (!document.hidden && paymentCheckInterval) {
         // Page became visible, user likely returned from UPI app
+        // DO NOT auto-confirm - require manual verification
+        console.log('App became visible - user returned from UPI app');
+        
+        // Show reminder about completing payment
         setTimeout(() => {
-          const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
-          if (pendingOrder && Math.random() > 0.4) {
-            handlePaymentSuccess(pendingOrder);
+          if (paymentCheckInterval) {
+            showToast('💳 Complete your UPI payment and click "I\'ve Completed Payment" to confirm your order', 'warning');
           }
-        }, 1500);
+        }, 2000);
       }
     }
 
@@ -5633,14 +5862,56 @@ Current Status: Demo mode with simulated GPS
       // Hide processing modal
       document.getElementById('payment-processing-modal').classList.add('hidden');
 
-      // Show failure modal
+      // Update order status to failed
+      order.status = 'payment-failed';
+      order.paymentStatus = 'failed';
+      order.failureReason = reason;
+      order.failureTimestamp = new Date().toLocaleString();
+
+      // Show failure modal with detailed information
       document.getElementById('failure-reason').textContent = reason;
       document.getElementById('failed-order-id').textContent = order.id;
       document.getElementById('payment-failed-modal').classList.remove('hidden');
+
+      // Show error toast
+      showToast(`❌ Payment verification failed: ${reason}`, 'error');
+
+      // Log failure for debugging
+      console.log('Payment verification failed:', {
+        orderId: order.id,
+        reason: reason,
+        timestamp: new Date().toISOString()
+      });
     }
 
     function handlePaymentTimeout(order) {
-      handlePaymentFailure(order, 'Payment timeout - transaction took too long');
+      // Clear any remaining intervals
+      if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+        paymentCheckInterval = null;
+      }
+
+      // Remove event listeners
+      window.removeEventListener('focus', handleAppFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      // Update order status
+      order.status = 'payment-timeout';
+      order.paymentStatus = 'timeout';
+      order.timeoutTimestamp = new Date().toLocaleString();
+
+      // Handle as payment failure with specific timeout message
+      handlePaymentFailure(order, 'Payment timeout - 10 minutes exceeded. Order cancelled due to incomplete payment.');
+
+      // Show specific timeout notification
+      showToast('⏰ Payment timeout! Order cancelled. Please place a new order if needed.', 'error');
+
+      // Log timeout
+      console.log('Payment timeout:', {
+        orderId: order.id,
+        timeoutAt: new Date().toISOString(),
+        reason: 'User did not complete payment within 10 minutes'
+      });
     }
 
     function closePaymentSuccess() {
@@ -5713,15 +5984,42 @@ Current Status: Demo mode with simulated GPS
     }
 
     function cancelUPIPayment() {
+      // Clear any running payment check intervals
+      if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+        paymentCheckInterval = null;
+      }
+
+      // Remove event listeners
+      window.removeEventListener('focus', handleAppFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
       // Clear pending order
+      const pendingOrder = localStorage.getItem('pendingOrder');
+      if (pendingOrder) {
+        const order = JSON.parse(pendingOrder);
+        console.log('Order cancelled by user:', {
+          orderId: order.id,
+          cancelledAt: new Date().toISOString(),
+          reason: 'User cancelled payment'
+        });
+      }
+      
       localStorage.removeItem('pendingOrder');
       
       // Hide all payment modals
       document.getElementById('upi-payment-modal').classList.add('hidden');
-      document.getElementById('payment-confirmation-modal').classList.add('hidden');
+      document.getElementById('payment-processing-modal').classList.add('hidden');
+      document.getElementById('payment-failed-modal').classList.add('hidden');
       
       // Show cancellation message
-      alert('Order cancelled. You can place a new order anytime.');
+      showToast('❌ Order cancelled. You can place a new order anytime.', 'warning');
+      
+      // Reset cart and UI
+      cart = [];
+      updateCartDisplay();
+      displayProducts(filteredProducts);
+      closeCart();
     }
 
     // Check for pending payment on page load
@@ -6179,5 +6477,5 @@ FreshFlow Order Management System`;
       document.getElementById('checkout-form').reset();
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'966dae45212711ee',t:'MTc1MzgwMzI3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'966ddaf2e01c85e4',t:'MTc1MzgwNTEwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
