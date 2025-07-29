@@ -6,6 +6,7 @@
   <title>FreshFlow - Premium Water & Meat Delivery | Fresh Quality Guaranteed</title>
   <meta name="description" content="Order fresh water and premium meat online. Fast 30-minute delivery, quality guaranteed. Cash on delivery and UPI payment available.">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=geometry,places&callback=initGoogleMaps"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -497,31 +498,43 @@
           </div>
           
           <!-- User Profile Section -->
-          <div id="user-profile" class="hidden flex items-center space-x-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-200">
-            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <span class="text-white text-sm font-bold" id="user-initial">U</span>
+          <div id="user-profile" class="hidden flex items-center space-x-2 bg-blue-50 rounded-lg px-2 py-1 border border-blue-200">
+            <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+              <span class="text-white text-xs font-bold" id="user-initial">U</span>
             </div>
-            <div class="text-sm">
+            <div class="text-xs">
               <div class="font-medium text-blue-800" id="user-name-display"></div>
-              <div class="text-blue-600 text-xs">Registered User</div>
+              <div class="text-blue-600 text-xs">User</div>
             </div>
-            <button onclick="showUserProfile()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-              Profile
-            </button>
+            <div class="flex space-x-1">
+              <button onclick="showMyOrders()" class="bg-black hover:bg-gray-800 text-white px-2 py-1 rounded text-xs font-medium transition-all duration-300 shadow flex items-center space-x-1">
+                <span>📦</span>
+                <span class="hidden sm:inline">Orders</span>
+              </button>
+              <button onclick="showUserProfile()" class="text-blue-600 hover:text-blue-800 text-xs font-medium px-1">
+                Profile
+              </button>
+            </div>
           </div>
           
+          <!-- My Orders Button (Always Visible) -->
+          <button onclick="showMyOrders()" class="bg-black hover:bg-gray-800 text-white px-2 py-1 rounded text-xs font-medium shadow hover:shadow-lg transition-all duration-300 flex items-center space-x-1">
+            <span>📦</span>
+            <span class="hidden sm:inline">My Orders</span>
+          </button>
+          
           <!-- Login Button -->
-          <button id="login-btn" onclick="showUserLogin()" class="btn-primary text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300">
-            <span class="flex items-center space-x-2">
+          <button id="login-btn" onclick="showUserLogin()" class="btn-primary text-white px-3 py-1 rounded text-xs font-medium shadow hover:shadow-lg transition-all duration-300">
+            <span class="flex items-center space-x-1">
               <span>👤</span>
-              <span>Login</span>
+              <span class="hidden sm:inline">Login</span>
             </span>
           </button>
           
           <!-- Admin Button -->
-          <button onclick="toggleAdmin()" class="flex items-center space-x-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium shadow-lg">
+          <button onclick="toggleAdmin()" class="flex items-center space-x-1 bg-black hover:bg-gray-800 text-white px-2 py-1 rounded transition-all duration-300 text-xs font-medium shadow">
             <span>⚙️</span>
-            <span>Admin</span>
+            <span class="hidden sm:inline">Admin</span>
           </button>
         </div>
       </div>
@@ -608,8 +621,39 @@
     </div>
   </div>
 
+  <!-- My Orders Modal -->
+  <div id="my-orders-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">📦 My Orders</h2>
+        <button onclick="closeMyOrders()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+      </div>
+      
+      <!-- Order Filters -->
+      <div class="flex flex-wrap gap-3 mb-6">
+        <button onclick="filterMyOrders('all')" id="filter-all" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">All Orders</button>
+        <button onclick="filterMyOrders('pending')" id="filter-pending" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300">Pending</button>
+        <button onclick="filterMyOrders('processing')" id="filter-processing" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300">Processing</button>
+        <button onclick="filterMyOrders('out-for-delivery')" id="filter-out-for-delivery" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300">Out for Delivery</button>
+        <button onclick="filterMyOrders('delivered')" id="filter-delivered" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300">Delivered</button>
+      </div>
+      
+      <!-- Orders List -->
+      <div id="my-orders-list" class="space-y-4">
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4">📦</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No orders found</h3>
+          <p class="text-gray-600 mb-6">You haven't placed any orders yet</p>
+          <button onclick="closeMyOrders()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            Start Shopping
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Location Selection Modal -->
-  <div id="location-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div id="location-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-lg p-8 max-w-md w-full">
       <h2 class="text-2xl font-semibold mb-6 text-center">📍 Select Delivery Location</h2>
       <div class="space-y-4">
@@ -1062,66 +1106,200 @@
 
   <!-- Order Tracking Modal -->
   <div id="tracking-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+    <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold">Track Your Order</h2>
+        <h2 class="text-2xl font-semibold">🚚 Track Your Order</h2>
         <button onclick="closeTracking()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
       </div>
       
-      <div class="mb-6">
-        <div class="bg-blue-50 p-4 rounded-lg mb-4">
-          <p class="text-sm text-gray-600">Order #<span id="tracking-order-id" class="font-bold"></span></p>
-          <p class="text-sm text-gray-600">Placed: <span id="tracking-order-time" class="font-medium"></span></p>
-          <p class="text-lg font-semibold text-blue-600 mt-2">Total: ₹<span id="tracking-order-total"></span></p>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Order Status Section -->
+        <div>
+          <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <p class="text-sm text-gray-600">Order #<span id="tracking-order-id" class="font-bold"></span></p>
+            <p class="text-sm text-gray-600">Placed: <span id="tracking-order-time" class="font-medium"></span></p>
+            <p class="text-lg font-semibold text-blue-600 mt-2">Total: ₹<span id="tracking-order-total"></span></p>
+          </div>
+          
+          <!-- Delivery Person Info -->
+          <div id="delivery-person-info" class="bg-green-50 p-4 rounded-lg mb-4 hidden">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-lg" id="delivery-person-initial">D</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-green-800" id="delivery-person-name">Delivery Partner</h4>
+                <p class="text-sm text-green-600" id="delivery-person-phone">📞 Contact: +91-XXXXXXXXXX</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-green-700">
+                <p>🛵 Vehicle: <span id="delivery-vehicle">Bike</span></p>
+                <p>📍 Distance: <span id="delivery-distance">Calculating...</span></p>
+                <p>⏱️ ETA: <span id="delivery-eta">Calculating...</span></p>
+              </div>
+              <div class="flex space-x-2">
+                <button onclick="callDeliveryPerson()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                  📞 Call
+                </button>
+                <button onclick="messageDeliveryPerson()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                  💬 Message
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <div id="status-pending" class="flex items-center p-3 rounded-lg bg-yellow-50 border-l-4 border-yellow-400">
+              <div class="flex-shrink-0 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+              <div class="ml-4">
+                <p class="font-medium text-yellow-800">Order Confirmed</p>
+                <p class="text-sm text-yellow-600">Your order has been received and confirmed</p>
+              </div>
+            </div>
+            
+            <div id="status-processing" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+              <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+              <div class="ml-4">
+                <p class="font-medium text-gray-600">Preparing Order</p>
+                <p class="text-sm text-gray-500">Your order is being prepared</p>
+              </div>
+            </div>
+            
+            <div id="status-ready" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+              <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+              <div class="ml-4">
+                <p class="font-medium text-gray-600">Ready for Delivery</p>
+                <p class="text-sm text-gray-500">Order is ready and will be dispatched soon</p>
+              </div>
+            </div>
+            
+            <div id="status-out-for-delivery" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+              <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">4</div>
+              <div class="ml-4">
+                <p class="font-medium text-gray-600">Out for Delivery</p>
+                <p class="text-sm text-gray-500">Your order is on the way</p>
+              </div>
+            </div>
+            
+            <div id="status-delivered" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
+              <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">5</div>
+              <div class="ml-4">
+                <p class="font-medium text-gray-600">Delivered</p>
+                <p class="text-sm text-gray-500">Order has been delivered successfully</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 p-4 rounded-lg mt-4">
+            <h4 class="font-medium mb-2">Order Items:</h4>
+            <div id="tracking-items" class="space-y-1">
+              <!-- Items will be loaded here -->
+            </div>
+          </div>
         </div>
         
-        <div class="space-y-4">
-          <div id="status-pending" class="flex items-center p-3 rounded-lg bg-yellow-50 border-l-4 border-yellow-400">
-            <div class="flex-shrink-0 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
-            <div class="ml-4">
-              <p class="font-medium text-yellow-800">Order Confirmed</p>
-              <p class="text-sm text-yellow-600">Your order has been received and confirmed</p>
+        <!-- Live GPS Tracking Section -->
+        <div>
+          <div class="bg-white border rounded-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold">📍 Live GPS Tracking</h3>
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span class="text-sm">Live</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Map Container -->
+            <div id="tracking-map" class="h-80 bg-gray-100 relative overflow-hidden">
+              <!-- Google Map will be rendered here -->
+              <div id="google-map" class="w-full h-full"></div>
+              <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-white">
+                <div class="text-center">
+                  <div class="text-4xl mb-2">🗺️</div>
+                  <p class="text-gray-600">Loading Google Maps...</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Map Controls -->
+            <div class="p-4 bg-gray-50 border-t">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2">
+                  <button onclick="centerMapOnDelivery()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                    🎯 Center on Delivery
+                  </button>
+                  <button onclick="centerMapOnCustomer()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                    🏠 My Location
+                  </button>
+                </div>
+                <button onclick="toggleMapFullscreen()" class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+                  ⛶ Fullscreen
+                </button>
+              </div>
+              
+              <!-- Location Updates -->
+              <div class="text-xs text-gray-600">
+                <p>Last updated: <span id="location-last-update">Just now</span></p>
+                <p>Accuracy: <span id="location-accuracy">High</span> | Speed: <span id="delivery-speed">0 km/h</span></p>
+              </div>
             </div>
           </div>
           
-          <div id="status-processing" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
-            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
-            <div class="ml-4">
-              <p class="font-medium text-gray-600">Preparing Order</p>
-              <p class="text-sm text-gray-500">Your order is being prepared</p>
-            </div>
-          </div>
-          
-          <div id="status-ready" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
-            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
-            <div class="ml-4">
-              <p class="font-medium text-gray-600">Ready for Delivery</p>
-              <p class="text-sm text-gray-500">Order is ready and will be dispatched soon</p>
-            </div>
-          </div>
-          
-          <div id="status-out-for-delivery" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
-            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">4</div>
-            <div class="ml-4">
-              <p class="font-medium text-gray-600">Out for Delivery</p>
-              <p class="text-sm text-gray-500">Your order is on the way</p>
-            </div>
-          </div>
-          
-          <div id="status-delivered" class="flex items-center p-3 rounded-lg bg-gray-50 border-l-4 border-gray-300">
-            <div class="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-sm">5</div>
-            <div class="ml-4">
-              <p class="font-medium text-gray-600">Delivered</p>
-              <p class="text-sm text-gray-500">Order has been delivered successfully</p>
+          <!-- Delivery Updates Timeline -->
+          <div class="mt-4 bg-white border rounded-lg p-4">
+            <h4 class="font-semibold mb-3">📱 Live Updates</h4>
+            <div id="delivery-updates" class="space-y-2 max-h-32 overflow-y-auto">
+              <div class="text-sm text-gray-600 bg-blue-50 p-2 rounded">
+                <span class="font-medium">Just now:</span> Tracking started
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <h4 class="font-medium mb-2">Order Items:</h4>
-        <div id="tracking-items" class="space-y-1">
-          <!-- Items will be loaded here -->
+    </div>
+  </div>
+
+  <!-- GPS Fullscreen Map Modal -->
+  <div id="fullscreen-map-modal" class="fixed inset-0 bg-black bg-opacity-90 hidden z-50">
+    <div class="h-full flex flex-col">
+      <div class="bg-white p-4 flex items-center justify-between">
+        <h3 class="font-semibold">📍 Live GPS Tracking - Order #<span id="fullscreen-order-id"></span></h3>
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span class="text-sm">Live Tracking</span>
+          </div>
+          <button onclick="closeFullscreenMap()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+        </div>
+      </div>
+      <div id="fullscreen-map" class="flex-1 bg-gray-100 relative">
+        <!-- Fullscreen Google Map will be rendered here -->
+        <div id="fullscreen-google-map" class="w-full h-full"></div>
+        <div id="fullscreen-map-loading" class="absolute inset-0 flex items-center justify-center bg-white">
+          <div class="text-center">
+            <div class="text-4xl mb-2">🗺️</div>
+            <p class="text-gray-600">Loading Google Maps...</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white p-4 border-t">
+        <div class="flex items-center justify-between">
+          <div class="text-sm">
+            <span class="font-medium" id="fullscreen-delivery-person">Delivery Partner</span> • 
+            <span id="fullscreen-distance">Distance: Calculating...</span> • 
+            <span id="fullscreen-eta">ETA: Calculating...</span>
+          </div>
+          <div class="flex space-x-2">
+            <button onclick="callDeliveryPerson()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              📞 Call Driver
+            </button>
+            <button onclick="shareTrackingLink()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              📤 Share Tracking
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1286,29 +1464,37 @@
   <!-- Payment Processing Modal -->
   <div id="payment-processing-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg p-8 max-w-md w-full text-center">
-      <div class="text-4xl mb-4">⏳</div>
-      <h2 class="text-2xl font-semibold mb-4">Waiting for Payment</h2>
-      <p class="text-gray-600 mb-6">Complete the actual payment in your UPI app. We're monitoring for real payment confirmation...</p>
+      <div class="text-4xl mb-4">💳</div>
+      <h2 class="text-2xl font-semibold mb-4 text-red-600">⚠️ REAL PAYMENT REQUIRED</h2>
+      <p class="text-gray-800 mb-6 font-medium">Complete the ACTUAL MONEY TRANSFER in your UPI app. This is not a demo - real payment is required!</p>
       
-      <div class="bg-orange-50 p-4 rounded-lg mb-6 border-l-4 border-orange-400">
+      <div class="bg-red-50 p-4 rounded-lg mb-6 border-l-4 border-red-500">
         <div class="flex items-center justify-center space-x-2 mb-2">
-          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
-          <span class="text-sm text-orange-800 font-medium">Verifying real payment...</span>
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+          <span class="text-sm text-red-800 font-bold">Waiting for REAL payment...</span>
         </div>
-        <p class="text-xs text-orange-600">⚠️ This requires actual money transfer to confirm order</p>
+        <p class="text-xs text-red-700 font-medium">🚨 ACTUAL MONEY TRANSFER REQUIRED - NOT A SIMULATION</p>
       </div>
 
-      <div class="text-sm text-gray-500 space-y-1">
-        <p>✓ UPI app opened successfully</p>
-        <p>✓ Payment details pre-filled</p>
-        <p id="payment-status-text">⏳ Waiting for actual payment completion...</p>
-        <p class="text-xs text-red-600 mt-2">⚠️ Order will only be confirmed after real payment is received</p>
+      <div class="text-sm text-gray-700 space-y-2 bg-yellow-50 p-4 rounded-lg mb-4">
+        <p class="font-bold text-yellow-800">📱 Steps to Complete Payment:</p>
+        <p>1. ✓ UPI app should have opened</p>
+        <p>2. ✓ Verify amount and UPI ID: 9603831708@ybl</p>
+        <p>3. 🔴 COMPLETE THE ACTUAL PAYMENT</p>
+        <p>4. 📝 Note down your transaction ID</p>
+        <p class="text-xs text-red-600 mt-2 font-bold">⚠️ Order confirmed ONLY after real money transfer</p>
       </div>
       
       <div class="mt-6 space-y-2">
-        <button onclick="manualPaymentConfirmation()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm">I've Completed the Payment</button>
-        <button onclick="cancelUPIPayment()" class="w-full text-gray-500 hover:text-gray-700 text-sm">Cancel Order</button>
+        <button onclick="manualPaymentConfirmation()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-bold">
+          ✅ I've Completed the REAL Payment
+        </button>
+        <button onclick="cancelUPIPayment()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 text-sm">
+          ❌ Cancel Order (No Payment Made)
+        </button>
       </div>
+      
+      <p class="text-xs text-gray-500 mt-4">💡 Tip: Keep your UPI app transaction history ready for verification</p>
     </div>
   </div>
 
@@ -1398,8 +1584,33 @@
         loadUserSession();
         hideLoadingState();
         initializeAnimations();
+        requestLocationPermission();
       }, 800);
     });
+
+    // Request location permission for better tracking
+    function requestLocationPermission() {
+      if (navigator.geolocation) {
+        // Request permission without immediately getting location
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log('Location permission granted');
+            showToast('📍 Location access granted for better delivery tracking', 'success');
+          },
+          (error) => {
+            console.log('Location permission denied:', error);
+            if (error.code === error.PERMISSION_DENIED) {
+              showToast('📍 Location access denied. Tracking will use approximate location.', 'warning');
+            }
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 600000 // 10 minutes
+          }
+        );
+      }
+    }
 
     // Professional UI Functions
     function showLoadingState() {
@@ -1601,11 +1812,264 @@
       document.getElementById('user-profile').classList.add('hidden');
       document.getElementById('login-btn').classList.remove('hidden');
       document.getElementById('user-profile-modal').classList.add('hidden');
+      document.getElementById('my-orders-modal').classList.add('hidden');
       
       // Clear any checkout forms
       document.getElementById('customer-name').value = '';
       document.getElementById('customer-phone').value = '';
       document.getElementById('customer-address').value = '';
+    }
+
+    // My Orders Functions
+    function showMyOrders() {
+      document.getElementById('my-orders-modal').classList.remove('hidden');
+      loadMyOrders();
+    }
+
+    function closeMyOrders() {
+      document.getElementById('my-orders-modal').classList.add('hidden');
+    }
+
+    function loadMyOrders(filter = 'all') {
+      let userOrders = [];
+      
+      if (currentUser) {
+        // Get logged-in user's orders
+        userOrders = orders.filter(order => 
+          order.customer.phone === currentUser.phone
+        );
+        
+        // Check for pending order
+        const pendingOrder = localStorage.getItem('pendingOrder');
+        if (pendingOrder) {
+          const pending = JSON.parse(pendingOrder);
+          if (pending.customer.phone === currentUser.phone) {
+            userOrders.unshift(pending); // Add to beginning
+          }
+        }
+      } else {
+        // For guest users, show orders based on phone number from localStorage
+        const guestPhone = localStorage.getItem('customerPhone');
+        if (guestPhone) {
+          userOrders = orders.filter(order => 
+            order.customer.phone === guestPhone
+          );
+          
+          // Check for pending order
+          const pendingOrder = localStorage.getItem('pendingOrder');
+          if (pendingOrder) {
+            const pending = JSON.parse(pendingOrder);
+            if (pending.customer.phone === guestPhone) {
+              userOrders.unshift(pending); // Add to beginning
+            }
+          }
+        }
+        
+        // Also check for any pending order without phone match (for immediate after order)
+        if (userOrders.length === 0) {
+          const pendingOrder = localStorage.getItem('pendingOrder');
+          if (pendingOrder) {
+            const pending = JSON.parse(pendingOrder);
+            userOrders.push(pending);
+          }
+        }
+      }
+      
+      // Apply filter
+      if (filter !== 'all') {
+        userOrders = userOrders.filter(order => order.status === filter);
+      }
+      
+      const container = document.getElementById('my-orders-list');
+      
+      if (userOrders.length === 0) {
+        const isLoggedIn = !!currentUser;
+        const hasGuestPhone = !!localStorage.getItem('customerPhone');
+        
+        let message = "You haven't placed any orders yet";
+        let suggestion = "Start Shopping";
+        
+        if (!isLoggedIn && !hasGuestPhone) {
+          message = "No orders found. Orders are tracked by phone number.";
+          suggestion = "Place Your First Order";
+        } else if (filter !== 'all') {
+          message = `No ${filter} orders found`;
+          suggestion = "View All Orders";
+        }
+        
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">📦</div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No orders found</h3>
+            <p class="text-gray-600 mb-6">${message}</p>
+            ${!isLoggedIn && !hasGuestPhone ? `
+              <div class="bg-blue-50 p-4 rounded-lg mb-6 max-w-md mx-auto">
+                <p class="text-sm text-blue-800 mb-2">💡 <strong>How to track orders:</strong></p>
+                <p class="text-sm text-blue-700">• Orders are automatically tracked by your phone number</p>
+                <p class="text-sm text-blue-700">• No login required - just use the same phone number</p>
+                <p class="text-sm text-blue-700">• For better experience, create an account</p>
+              </div>
+            ` : ''}
+            <button onclick="closeMyOrders()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              ${suggestion}
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = userOrders.map(order => `
+        <div class="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="flex items-center space-x-3 mb-2">
+                <h3 class="text-lg font-semibold text-gray-900">Order #${order.id}</h3>
+                <span class="px-3 py-1 rounded-full text-xs font-medium ${getOrderStatusBadge(order.status)}">
+                  ${getOrderStatusText(order.status)}
+                </span>
+              </div>
+              <p class="text-sm text-gray-600 mb-1">📅 Placed: ${order.timestamp}</p>
+              <p class="text-sm text-gray-600 mb-1">⏰ Delivery: ${order.deliveryTime}</p>
+              <p class="text-sm text-gray-600">💳 Payment: ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'} ${order.paymentStatus ? `(${order.paymentStatus})` : ''}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-2xl font-bold text-blue-600">₹${order.total}</p>
+              <p class="text-sm text-gray-500">${order.items.length} item${order.items.length > 1 ? 's' : ''}</p>
+            </div>
+          </div>
+          
+          <div class="border-t pt-4 mb-4">
+            <h4 class="font-medium text-gray-900 mb-2">Order Items:</h4>
+            <div class="space-y-1">
+              ${order.items.map(item => `
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-700">${item.quantity}x ${item.name}</span>
+                  <span class="text-gray-900 font-medium">₹${item.price * item.quantity}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              <p>📍 ${order.customer.address}</p>
+              ${order.specialInstructions ? `<p>📝 ${order.specialInstructions}</p>` : ''}
+            </div>
+            <div class="flex space-x-2">
+              ${order.status === 'out-for-delivery' || order.status === 'delivered' ? `
+                <button onclick="trackOrderFromMyOrders(${order.id})" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  📍 Track Order
+                </button>
+              ` : ''}
+              ${order.status === 'delivered' ? `
+                <button onclick="reorderItems(${order.id})" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                  🔄 Reorder
+                </button>
+              ` : ''}
+              ${order.status === 'pending' || order.status === 'payment-pending' ? `
+                <button onclick="cancelOrder(${order.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+                  ❌ Cancel
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterMyOrders(filter) {
+      // Update filter buttons
+      document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+        btn.className = 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300';
+      });
+      document.getElementById(`filter-${filter}`).className = 'px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium';
+      
+      // Load filtered orders
+      loadMyOrders(filter);
+    }
+
+    function getOrderStatusBadge(status) {
+      switch(status) {
+        case 'payment-pending': return 'bg-orange-100 text-orange-800';
+        case 'payment-confirmed': return 'bg-green-100 text-green-800';
+        case 'pending': return 'bg-yellow-100 text-yellow-800';
+        case 'processing': return 'bg-blue-100 text-blue-800';
+        case 'ready': return 'bg-purple-100 text-purple-800';
+        case 'out-for-delivery': return 'bg-indigo-100 text-indigo-800';
+        case 'delivered': return 'bg-green-100 text-green-800';
+        case 'cancelled': return 'bg-red-100 text-red-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    function getOrderStatusText(status) {
+      switch(status) {
+        case 'payment-pending': return '⏳ Payment Pending';
+        case 'payment-confirmed': return '✅ Payment Confirmed';
+        case 'pending': return '📋 Order Confirmed';
+        case 'processing': return '👨‍🍳 Preparing';
+        case 'ready': return '📦 Ready';
+        case 'out-for-delivery': return '🚚 Out for Delivery';
+        case 'delivered': return '✅ Delivered';
+        case 'cancelled': return '❌ Cancelled';
+        default: return status;
+      }
+    }
+
+    function trackOrderFromMyOrders(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        closeMyOrders();
+        showOrderTracking(order);
+      }
+    }
+
+    function reorderItems(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      
+      // Clear current cart
+      cart = [];
+      
+      // Add order items to cart
+      order.items.forEach(item => {
+        const product = products.find(p => p.id === item.id);
+        if (product) {
+          cart.push({
+            ...product,
+            quantity: item.quantity
+          });
+        }
+      });
+      
+      updateCartDisplay();
+      displayProducts(filteredProducts);
+      closeMyOrders();
+      openCart();
+      
+      showToast(`${order.items.length} items added to cart from previous order!`, 'success');
+    }
+
+    function cancelOrder(orderId) {
+      if (!confirm('Are you sure you want to cancel this order?')) return;
+      
+      const orderIndex = orders.findIndex(o => o.id === orderId);
+      if (orderIndex !== -1) {
+        orders[orderIndex].status = 'cancelled';
+        loadMyOrders();
+        showToast('Order cancelled successfully', 'success');
+      }
+      
+      // Check if it's a pending order
+      const pendingOrder = localStorage.getItem('pendingOrder');
+      if (pendingOrder) {
+        const pending = JSON.parse(pendingOrder);
+        if (pending.id === orderId) {
+          localStorage.removeItem('pendingOrder');
+          loadMyOrders();
+          showToast('Order cancelled successfully', 'success');
+        }
+      }
     }
 
     // Location Management
@@ -1614,7 +2078,13 @@
       if (saved) {
         currentLocation = saved;
         document.getElementById('delivery-location').textContent = saved;
-        document.getElementById('location-modal').classList.add('hidden');
+        document.getElementById('delivery-location-mobile').textContent = saved;
+      } else {
+        // Set default location automatically without showing modal
+        currentLocation = 'Downtown';
+        document.getElementById('delivery-location').textContent = currentLocation;
+        document.getElementById('delivery-location-mobile').textContent = currentLocation;
+        localStorage.setItem('deliveryLocation', currentLocation);
       }
     }
 
@@ -1939,11 +2409,13 @@
               <h4 class="font-medium">Order #${order.id}</h4>
               <p class="text-sm text-gray-600">${order.timestamp}</p>
               <p class="text-sm text-gray-600">${order.customer.name} - ${order.customer.phone}</p>
+              ${order.realPaymentConfirmed ? '<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-1">✅ Real Payment Verified</span>' : ''}
             </div>
             <div class="text-right">
               <p class="font-medium text-blue-600">₹${order.total}</p>
               <select onchange="updateOrderStatus(${order.id}, this.value)" class="text-xs px-2 py-1 rounded border mt-1 ${getStatusColor(order.status)}">
                 <option value="payment-pending" ${order.status === 'payment-pending' ? 'selected' : ''}>Payment Pending</option>
+                <option value="payment-confirmed" ${order.status === 'payment-confirmed' ? 'selected' : ''}>Payment Confirmed</option>
                 <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
                 <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
                 <option value="ready" ${order.status === 'ready' ? 'selected' : ''}>Ready</option>
@@ -1958,8 +2430,19 @@
             <p><strong>Address:</strong> ${order.customer.address}</p>
             <p><strong>Payment:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'} ${order.paymentStatus ? `(${order.paymentStatus})` : ''}</p>
             ${order.paymentTimestamp ? `<p><strong>Payment Time:</strong> ${order.paymentTimestamp}</p>` : ''}
-            ${order.transactionId ? `<p><strong>Transaction ID:</strong> ${order.transactionId}</p>` : ''}
+            ${order.transactionId ? `<p><strong>Transaction ID:</strong> <span class="font-mono bg-gray-100 px-2 py-1 rounded text-xs">${order.transactionId}</span></p>` : ''}
+            ${order.paymentApp ? `<p><strong>Payment App:</strong> ${order.paymentApp}</p>` : ''}
+            ${order.userReportedPaymentTime ? `<p><strong>User Reported Time:</strong> ${order.userReportedPaymentTime}</p>` : ''}
+            ${order.paymentVerificationLevel ? `<p><strong>Verification:</strong> <span class="text-xs ${order.paymentVerificationLevel === 'manual-confirmation' ? 'text-orange-600' : 'text-green-600'}">${order.paymentVerificationLevel}</span></p>` : ''}
           </div>
+          ${order.paymentDetails ? `
+            <div class="mt-3 p-2 bg-gray-50 rounded text-xs">
+              <p><strong>Payment Details:</strong></p>
+              <p>Amount: ₹${order.paymentDetails.paymentAmount} | To: ${order.paymentDetails.paymentTo}</p>
+              <p>System Time: ${order.paymentDetails.systemTimestamp}</p>
+              <p>Device: ${order.paymentDetails.deviceInfo}</p>
+            </div>
+          ` : ''}
         </div>
       `).reverse().join('');
     }
@@ -1967,6 +2450,7 @@
     function getStatusColor(status) {
       switch(status) {
         case 'payment-pending': return 'bg-orange-100 text-orange-800';
+        case 'payment-confirmed': return 'bg-green-100 text-green-800';
         case 'pending': return 'bg-yellow-100 text-yellow-800';
         case 'processing': return 'bg-blue-100 text-blue-800';
         case 'ready': return 'bg-purple-100 text-purple-800';
@@ -2351,6 +2835,11 @@
       // Update status indicators
       updateTrackingStatus(order.status);
       
+      // Initialize GPS tracking if order is out for delivery
+      if (order.status === 'out-for-delivery') {
+        initializeGPSTracking(order);
+      }
+      
       document.getElementById('success-modal').classList.add('hidden');
       document.getElementById('tracking-modal').classList.remove('hidden');
     }
@@ -2401,7 +2890,997 @@
 
     function closeTracking() {
       document.getElementById('tracking-modal').classList.add('hidden');
+      // Stop GPS tracking when modal is closed
+      stopGPSTracking();
     }
+
+    // GPS Tracking System with Google Maps
+    let gpsTrackingInterval = null;
+    let currentTrackingOrder = null;
+    let deliveryPersonLocation = null;
+    let customerLocation = null;
+    let googleMap = null;
+    let fullscreenGoogleMap = null;
+    let deliveryMarker = null;
+    let customerMarker = null;
+    let routePath = null;
+    let directionsService = null;
+    let directionsRenderer = null;
+    let isGoogleMapsLoaded = false;
+
+    // Simulated delivery partners database
+    const deliveryPartners = [
+      { id: 1, name: 'Rajesh Kumar', phone: '+91-9876543210', vehicle: 'Bike', rating: 4.8 },
+      { id: 2, name: 'Amit Singh', phone: '+91-9876543211', vehicle: 'Scooter', rating: 4.9 },
+      { id: 3, name: 'Priya Sharma', phone: '+91-9876543212', vehicle: 'Bike', rating: 4.7 },
+      { id: 4, name: 'Vikash Yadav', phone: '+91-9876543213', vehicle: 'Bike', rating: 4.6 },
+      { id: 5, name: 'Sunita Devi', phone: '+91-9876543214', vehicle: 'Scooter', rating: 4.8 }
+    ];
+
+    // City coordinates for simulation (you can replace with real coordinates)
+    const cityLocations = {
+      'Downtown': { lat: 28.6139, lng: 77.2090 },
+      'Uptown': { lat: 28.6289, lng: 77.2065 },
+      'City Center': { lat: 28.6129, lng: 77.2295 },
+      'Suburbs': { lat: 28.5355, lng: 77.3910 }
+    };
+
+    // Google Maps Initialization
+    function initGoogleMaps() {
+      isGoogleMapsLoaded = true;
+      console.log('Google Maps API loaded successfully');
+      
+      // Initialize directions service
+      if (window.google && window.google.maps) {
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+          suppressMarkers: true,
+          polylineOptions: {
+            strokeColor: '#3B82F6',
+            strokeWeight: 4,
+            strokeOpacity: 0.8
+          }
+        });
+        
+        showToast('🗺️ Google Maps loaded successfully', 'success');
+      } else {
+        console.error('Google Maps failed to load');
+        showToast('⚠️ Maps not available. Please check your internet connection.', 'warning');
+      }
+    }
+
+    // Fallback if Google Maps fails to load
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        if (!isGoogleMapsLoaded) {
+          console.log('Google Maps API failed to load - using fallback');
+          showToast('⚠️ Google Maps unavailable. GPS tracking will use basic location services.', 'warning');
+          
+          // Show setup instructions
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            showSetupInstructions();
+          }
+        }
+      }, 5000);
+    });
+
+    function showSetupInstructions() {
+      const instructions = `
+🔧 SETUP REQUIRED FOR REAL ENVIRONMENT:
+
+1. 📍 GOOGLE MAPS API:
+   - Get API key from Google Cloud Console
+   - Replace 'YOUR_GOOGLE_MAPS_API_KEY' in the script tag
+   - Enable Maps JavaScript API, Places API, Directions API
+
+2. 🌐 HTTPS REQUIRED:
+   - GPS location only works on HTTPS
+   - Deploy to secure server or use ngrok for testing
+
+3. 📱 MOBILE TESTING:
+   - Test on actual mobile devices
+   - GPS tracking works best on phones
+
+4. 🚚 DELIVERY PARTNER APP:
+   - In production, delivery partner would have separate app
+   - Their GPS coordinates would be sent to your server
+   - Server would broadcast location to customer app
+
+5. 🔄 REAL-TIME UPDATES:
+   - Use WebSocket or Server-Sent Events
+   - Connect to backend API for live tracking
+   - Store GPS coordinates in database
+
+Current Status: Demo mode with simulated GPS
+      `;
+      
+      console.log(instructions);
+      
+      // Show in UI for developers
+      const devNotice = document.createElement('div');
+      devNotice.className = 'fixed bottom-4 left-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded shadow-lg max-w-sm z-50';
+      devNotice.innerHTML = `
+        <div class="flex items-start">
+          <div class="text-yellow-600 mr-2">⚠️</div>
+          <div>
+            <h4 class="font-bold text-yellow-800">Development Mode</h4>
+            <p class="text-sm text-yellow-700 mt-1">GPS tracking is simulated. Check console for setup instructions.</p>
+            <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-xs text-yellow-600 hover:text-yellow-800 mt-2">Dismiss</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(devNotice);
+      
+      // Auto-remove after 10 seconds
+      setTimeout(() => {
+        if (devNotice.parentElement) {
+          devNotice.remove();
+        }
+      }, 10000);
+    }
+
+    // Initialize Google Map for tracking
+    function initializeGoogleMap(containerId, isFullscreen = false) {
+      if (!isGoogleMapsLoaded || !window.google) {
+        console.log('Google Maps not loaded yet');
+        return null;
+      }
+
+      const mapContainer = document.getElementById(containerId);
+      if (!mapContainer) return null;
+
+      // Default center (Delhi)
+      const defaultCenter = { lat: 28.6139, lng: 77.2090 };
+      
+      const map = new google.maps.Map(mapContainer, {
+        zoom: 13,
+        center: defaultCenter,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ],
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: isFullscreen,
+        zoomControl: true
+      });
+
+      return map;
+    }
+
+    // Create custom markers
+    function createCustomMarker(map, position, type, title) {
+      const markerIcons = {
+        delivery: {
+          url: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="#3B82F6" stroke="white" stroke-width="3"/>
+              <text x="20" y="26" text-anchor="middle" fill="white" font-size="16" font-family="Arial">🛵</text>
+            </svg>
+          `),
+          scaledSize: new google.maps.Size(40, 40),
+          anchor: new google.maps.Point(20, 20)
+        },
+        customer: {
+          url: 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="#10B981" stroke="white" stroke-width="3"/>
+              <text x="20" y="26" text-anchor="middle" fill="white" font-size="16" font-family="Arial">🏠</text>
+            </svg>
+          `),
+          scaledSize: new google.maps.Size(40, 40),
+          anchor: new google.maps.Point(20, 20)
+        }
+      };
+
+      const marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        title: title,
+        icon: markerIcons[type],
+        animation: google.maps.Animation.DROP
+      });
+
+      return marker;
+    }
+
+    // Update route on map
+    function updateMapRoute(map, start, end) {
+      if (!directionsService || !directionsRenderer) return;
+
+      directionsRenderer.setMap(map);
+
+      const request = {
+        origin: start,
+        destination: end,
+        travelMode: google.maps.TravelMode.DRIVING,
+        avoidHighways: false,
+        avoidTolls: false
+      };
+
+      directionsService.route(request, (result, status) => {
+        if (status === 'OK') {
+          directionsRenderer.setDirections(result);
+          
+          // Calculate and display route info
+          const route = result.routes[0];
+          const leg = route.legs[0];
+          
+          // Update distance and duration displays
+          document.getElementById('delivery-distance').textContent = leg.distance.text;
+          document.getElementById('delivery-eta').textContent = leg.duration.text;
+          document.getElementById('fullscreen-distance').textContent = `Distance: ${leg.distance.text}`;
+          document.getElementById('fullscreen-eta').textContent = `ETA: ${leg.duration.text}`;
+        } else {
+          console.error('Directions request failed:', status);
+        }
+      });
+    }
+
+    function initializeGPSTracking(order) {
+      currentTrackingOrder = order;
+      
+      // Assign random delivery partner
+      const partner = deliveryPartners[Math.floor(Math.random() * deliveryPartners.length)];
+      order.deliveryPartner = partner;
+      
+      // Show delivery partner info
+      showDeliveryPartnerInfo(partner);
+      
+      // Get customer location (simulate based on delivery location)
+      getCustomerLocation(order);
+      
+      // Start GPS tracking simulation
+      startGPSTracking();
+      
+      // Initialize Google Maps
+      initializeTrackingMap();
+    }
+
+    function showDeliveryPartnerInfo(partner) {
+      document.getElementById('delivery-person-info').classList.remove('hidden');
+      document.getElementById('delivery-person-name').textContent = partner.name;
+      document.getElementById('delivery-person-phone').textContent = `📞 Contact: ${partner.phone}`;
+      document.getElementById('delivery-person-initial').textContent = partner.name.charAt(0);
+      document.getElementById('delivery-vehicle').textContent = partner.vehicle;
+    }
+
+    function getCustomerLocation(order) {
+      // Try to get real customer location using GPS
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            // Use real customer GPS location
+            customerLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            // Start delivery person at a nearby location (simulating restaurant/store)
+            deliveryPersonLocation = {
+              lat: customerLocation.lat + (Math.random() - 0.5) * 0.02,
+              lng: customerLocation.lng + (Math.random() - 0.5) * 0.02,
+              heading: Math.random() * 360,
+              speed: 0
+            };
+            
+            // Update map with real locations
+            if (googleMap) {
+              initializeTrackingMap();
+            }
+            
+            showToast('📍 Using your real GPS location for tracking', 'success');
+          },
+          (error) => {
+            console.log('GPS location failed:', error);
+            // Fallback to simulated location
+            const baseLocation = cityLocations[order.customer.location] || cityLocations['Downtown'];
+            
+            customerLocation = {
+              lat: baseLocation.lat + (Math.random() - 0.5) * 0.01,
+              lng: baseLocation.lng + (Math.random() - 0.5) * 0.01
+            };
+            
+            deliveryPersonLocation = {
+              lat: baseLocation.lat + (Math.random() - 0.5) * 0.02,
+              lng: baseLocation.lng + (Math.random() - 0.5) * 0.02,
+              heading: Math.random() * 360,
+              speed: 0
+            };
+            
+            showToast('📍 Using approximate location (GPS not available)', 'warning');
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutes
+          }
+        );
+      } else {
+        // Fallback for browsers without geolocation
+        const baseLocation = cityLocations[order.customer.location] || cityLocations['Downtown'];
+        
+        customerLocation = {
+          lat: baseLocation.lat + (Math.random() - 0.5) * 0.01,
+          lng: baseLocation.lng + (Math.random() - 0.5) * 0.01
+        };
+        
+        deliveryPersonLocation = {
+          lat: baseLocation.lat + (Math.random() - 0.5) * 0.02,
+          lng: baseLocation.lng + (Math.random() - 0.5) * 0.02,
+          heading: Math.random() * 360,
+          speed: 0
+        };
+        
+        showToast('📍 GPS not supported, using approximate location', 'warning');
+      }
+    }
+
+    function startGPSTracking() {
+      if (gpsTrackingInterval) {
+        clearInterval(gpsTrackingInterval);
+      }
+      
+      // Update location every 5 seconds for more realistic tracking
+      gpsTrackingInterval = setInterval(() => {
+        updateDeliveryPersonLocation();
+        updateTrackingDisplay();
+        addDeliveryUpdate();
+        
+        // Periodically update customer location if available
+        updateCustomerLocationIfNeeded();
+      }, 5000);
+      
+      // Initial update
+      updateTrackingDisplay();
+      
+      // Start continuous location watching for customer
+      startCustomerLocationWatching();
+    }
+
+    let customerLocationWatcher = null;
+
+    function startCustomerLocationWatching() {
+      if (navigator.geolocation && !customerLocationWatcher) {
+        customerLocationWatcher = navigator.geolocation.watchPosition(
+          (position) => {
+            // Update customer location in real-time
+            customerLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            // Update map with new customer location
+            if (googleMap && customerMarker) {
+              customerMarker.setPosition(customerLocation);
+              updateMapRoute(googleMap, deliveryPersonLocation, customerLocation);
+            }
+          },
+          (error) => {
+            console.log('Customer location watch error:', error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 30000 // 30 seconds
+          }
+        );
+      }
+    }
+
+    function updateCustomerLocationIfNeeded() {
+      // Periodically refresh customer location for accuracy
+      if (navigator.geolocation && Math.random() > 0.8) { // 20% chance each update
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const newLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            // Only update if location changed significantly (more than 10 meters)
+            if (customerLocation) {
+              const distance = calculateDistance(customerLocation, newLocation);
+              if (distance > 0.01) { // 10 meters
+                customerLocation = newLocation;
+                if (googleMap && customerMarker) {
+                  customerMarker.setPosition(customerLocation);
+                }
+              }
+            }
+          },
+          (error) => {
+            // Silently handle errors for periodic updates
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 60000 // 1 minute
+          }
+        );
+      }
+    }
+
+    function stopGPSTracking() {
+      if (gpsTrackingInterval) {
+        clearInterval(gpsTrackingInterval);
+        gpsTrackingInterval = null;
+      }
+      
+      // Stop watching customer location
+      if (customerLocationWatcher) {
+        navigator.geolocation.clearWatch(customerLocationWatcher);
+        customerLocationWatcher = null;
+      }
+    }
+
+    function updateDeliveryPersonLocation() {
+      if (!deliveryPersonLocation || !customerLocation) return;
+      
+      // In a real environment, this would get actual GPS coordinates from delivery person's device
+      // For now, we simulate realistic movement towards customer
+      
+      // Calculate direction towards customer
+      const deltaLat = customerLocation.lat - deliveryPersonLocation.lat;
+      const deltaLng = customerLocation.lng - deliveryPersonLocation.lng;
+      const distance = Math.sqrt(deltaLat * deltaLat + deltaLng * deltaLng);
+      
+      // If very close to customer, stop moving
+      if (distance < 0.0005) {
+        deliveryPersonLocation.speed = 0;
+        return;
+      }
+      
+      // Simulate realistic movement with road constraints
+      const baseSpeed = 0.0001; // Base movement speed
+      const speedVariation = Math.random() * 0.0001; // Speed variation
+      const speed = baseSpeed + speedVariation;
+      
+      // Calculate direction with road-like movement (not straight line)
+      const direction = Math.atan2(deltaLat, deltaLng);
+      
+      // Add realistic movement patterns (following roads, traffic, etc.)
+      const roadFactor = 0.2; // Simulate following roads
+      const trafficFactor = Math.random() > 0.8 ? 0.5 : 1; // Simulate traffic delays
+      const actualDirection = direction + (Math.random() - 0.5) * roadFactor;
+      
+      // Update position with traffic consideration
+      const adjustedSpeed = speed * trafficFactor;
+      deliveryPersonLocation.lat += Math.sin(actualDirection) * adjustedSpeed;
+      deliveryPersonLocation.lng += Math.cos(actualDirection) * adjustedSpeed;
+      deliveryPersonLocation.heading = actualDirection * (180 / Math.PI);
+      deliveryPersonLocation.speed = (adjustedSpeed * 111000 * 3.6).toFixed(1); // Convert to km/h
+      
+      // Add GPS accuracy simulation
+      deliveryPersonLocation.accuracy = Math.random() > 0.9 ? 'Medium' : 'High';
+      deliveryPersonLocation.lastUpdate = new Date();
+      
+      // Update accuracy display
+      document.getElementById('location-accuracy').textContent = deliveryPersonLocation.accuracy;
+    }
+
+    function updateTrackingDisplay() {
+      if (!deliveryPersonLocation || !customerLocation) return;
+      
+      // Calculate distance and ETA using Google Maps if available
+      if (isGoogleMapsLoaded && window.google) {
+        // Use Google Maps Distance Matrix API for more accurate calculations
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix({
+          origins: [deliveryPersonLocation],
+          destinations: [customerLocation],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC,
+          avoidHighways: false,
+          avoidTolls: false
+        }, (response, status) => {
+          if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
+            const element = response.rows[0].elements[0];
+            const distance = element.distance.text;
+            const duration = element.duration.text;
+            
+            // Update display elements
+            document.getElementById('delivery-distance').textContent = distance;
+            document.getElementById('delivery-eta').textContent = duration;
+            document.getElementById('fullscreen-distance').textContent = `Distance: ${distance}`;
+            document.getElementById('fullscreen-eta').textContent = `ETA: ${duration}`;
+          }
+        });
+      } else {
+        // Fallback to manual calculation
+        const distance = calculateDistance(deliveryPersonLocation, customerLocation);
+        const eta = calculateETA(distance, deliveryPersonLocation.speed || 20);
+        
+        // Update display elements
+        document.getElementById('delivery-distance').textContent = `${distance.toFixed(1)} km`;
+        document.getElementById('delivery-eta').textContent = eta;
+        document.getElementById('fullscreen-distance').textContent = `Distance: ${distance.toFixed(1)} km`;
+        document.getElementById('fullscreen-eta').textContent = `ETA: ${eta}`;
+      }
+      
+      // Update other display elements
+      document.getElementById('delivery-speed').textContent = `${deliveryPersonLocation.speed || 0} km/h`;
+      document.getElementById('location-last-update').textContent = 'Just now';
+      document.getElementById('location-accuracy').textContent = 'High';
+      
+      // Update map if initialized
+      if (googleMap) {
+        updateMapMarkers();
+      }
+    }
+
+    function calculateDistance(pos1, pos2) {
+      const R = 6371; // Earth's radius in km
+      const dLat = (pos2.lat - pos1.lat) * Math.PI / 180;
+      const dLng = (pos2.lng - pos1.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(pos1.lat * Math.PI / 180) * Math.cos(pos2.lat * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function calculateETA(distance, speed) {
+      if (speed === 0) return 'Calculating...';
+      const timeInHours = distance / speed;
+      const timeInMinutes = Math.round(timeInHours * 60);
+      
+      if (timeInMinutes < 1) return 'Arriving now';
+      if (timeInMinutes === 1) return '1 minute';
+      if (timeInMinutes < 60) return `${timeInMinutes} minutes`;
+      
+      const hours = Math.floor(timeInMinutes / 60);
+      const minutes = timeInMinutes % 60;
+      return `${hours}h ${minutes}m`;
+    }
+
+    function addDeliveryUpdate() {
+      const updates = [
+        'Moving towards your location',
+        'On the main road',
+        'Taking the fastest route',
+        'Navigating through traffic',
+        'Almost there!',
+        'Looking for parking',
+        'Arrived at your building'
+      ];
+      
+      // Randomly add updates
+      if (Math.random() > 0.7) {
+        const update = updates[Math.floor(Math.random() * updates.length)];
+        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        const updatesContainer = document.getElementById('delivery-updates');
+        const updateElement = document.createElement('div');
+        updateElement.className = 'text-sm text-gray-600 bg-green-50 p-2 rounded';
+        updateElement.innerHTML = `<span class="font-medium">${time}:</span> ${update}`;
+        
+        updatesContainer.insertBefore(updateElement, updatesContainer.firstChild);
+        
+        // Keep only last 5 updates
+        while (updatesContainer.children.length > 5) {
+          updatesContainer.removeChild(updatesContainer.lastChild);
+        }
+      }
+    }
+
+    // Initialize Google Maps for tracking
+    function initializeTrackingMap() {
+      // Hide loading indicator
+      const loadingElement = document.getElementById('map-loading');
+      if (loadingElement) {
+        loadingElement.style.display = 'none';
+      }
+
+      // Initialize main tracking map
+      googleMap = initializeGoogleMap('google-map', false);
+      
+      if (googleMap && deliveryPersonLocation && customerLocation) {
+        // Create markers
+        deliveryMarker = createCustomMarker(
+          googleMap, 
+          deliveryPersonLocation, 
+          'delivery', 
+          `${currentTrackingOrder.deliveryPartner.name} - Delivery Partner`
+        );
+        
+        customerMarker = createCustomMarker(
+          googleMap, 
+          customerLocation, 
+          'customer', 
+          'Your Location'
+        );
+
+        // Set up route
+        updateMapRoute(googleMap, deliveryPersonLocation, customerLocation);
+
+        // Center map to show both markers
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(deliveryPersonLocation);
+        bounds.extend(customerLocation);
+        googleMap.fitBounds(bounds);
+        
+        // Add some padding
+        setTimeout(() => {
+          googleMap.panToBounds(bounds);
+        }, 1000);
+      } else if (!isGoogleMapsLoaded) {
+        // Fallback: show loading message
+        const mapContainer = document.getElementById('google-map');
+        if (mapContainer) {
+          mapContainer.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-gray-100">
+              <div class="text-center">
+                <div class="text-4xl mb-2">🗺️</div>
+                <p class="text-gray-600">Loading Google Maps...</p>
+                <p class="text-sm text-gray-500 mt-2">Please wait while we initialize the map</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+    }
+
+    function updateMapMarkers() {
+      if (!googleMap || !deliveryPersonLocation || !customerLocation) return;
+      
+      // Update delivery marker position
+      if (deliveryMarker) {
+        deliveryMarker.setPosition(deliveryPersonLocation);
+        
+        // Add smooth animation
+        if (deliveryMarker.getAnimation() !== google.maps.Animation.BOUNCE) {
+          deliveryMarker.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(() => {
+            deliveryMarker.setAnimation(null);
+          }, 2000);
+        }
+      }
+      
+      // Update route
+      updateMapRoute(googleMap, deliveryPersonLocation, customerLocation);
+      
+      // Update fullscreen map if it exists
+      if (fullscreenGoogleMap && document.getElementById('fullscreen-map-modal').classList.contains('hidden') === false) {
+        updateFullscreenMap();
+      }
+    }
+
+    function updateFullscreenMap() {
+      if (!fullscreenGoogleMap || !deliveryPersonLocation || !customerLocation) return;
+      
+      // Update markers on fullscreen map
+      const deliveryMarkerFullscreen = createCustomMarker(
+        fullscreenGoogleMap, 
+        deliveryPersonLocation, 
+        'delivery', 
+        `${currentTrackingOrder.deliveryPartner.name} - Delivery Partner`
+      );
+      
+      const customerMarkerFullscreen = createCustomMarker(
+        fullscreenGoogleMap, 
+        customerLocation, 
+        'customer', 
+        'Your Location'
+      );
+      
+      // Update route on fullscreen map
+      updateMapRoute(fullscreenGoogleMap, deliveryPersonLocation, customerLocation);
+    }
+
+    // Map Control Functions
+    function centerMapOnDelivery() {
+      if (googleMap && deliveryPersonLocation) {
+        googleMap.setCenter(deliveryPersonLocation);
+        googleMap.setZoom(16);
+        
+        // Add bounce animation to delivery marker
+        if (deliveryMarker) {
+          deliveryMarker.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(() => {
+            deliveryMarker.setAnimation(null);
+          }, 2000);
+        }
+        
+        showToast('Map centered on delivery partner', 'success');
+      }
+    }
+
+    function centerMapOnCustomer() {
+      if (googleMap && customerLocation) {
+        googleMap.setCenter(customerLocation);
+        googleMap.setZoom(16);
+        
+        // Add bounce animation to customer marker
+        if (customerMarker) {
+          customerMarker.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(() => {
+            customerMarker.setAnimation(null);
+          }, 2000);
+        }
+        
+        showToast('Map centered on your location', 'success');
+      }
+    }
+
+    function toggleMapFullscreen() {
+      document.getElementById('fullscreen-order-id').textContent = currentTrackingOrder?.id || '';
+      document.getElementById('fullscreen-delivery-person').textContent = currentTrackingOrder?.deliveryPartner?.name || 'Delivery Partner';
+      
+      // Hide fullscreen loading indicator
+      const fullscreenLoadingElement = document.getElementById('fullscreen-map-loading');
+      if (fullscreenLoadingElement) {
+        fullscreenLoadingElement.style.display = 'none';
+      }
+      
+      // Initialize fullscreen Google Map
+      fullscreenGoogleMap = initializeGoogleMap('fullscreen-google-map', true);
+      
+      if (fullscreenGoogleMap && deliveryPersonLocation && customerLocation) {
+        // Create markers for fullscreen map
+        const deliveryMarkerFullscreen = createCustomMarker(
+          fullscreenGoogleMap, 
+          deliveryPersonLocation, 
+          'delivery', 
+          `${currentTrackingOrder.deliveryPartner.name} - Delivery Partner`
+        );
+        
+        const customerMarkerFullscreen = createCustomMarker(
+          fullscreenGoogleMap, 
+          customerLocation, 
+          'customer', 
+          'Your Location'
+        );
+
+        // Set up route for fullscreen map
+        updateMapRoute(fullscreenGoogleMap, deliveryPersonLocation, customerLocation);
+
+        // Center map to show both markers
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(deliveryPersonLocation);
+        bounds.extend(customerLocation);
+        fullscreenGoogleMap.fitBounds(bounds);
+      }
+      
+      document.getElementById('fullscreen-map-modal').classList.remove('hidden');
+    }
+
+    function closeFullscreenMap() {
+      document.getElementById('fullscreen-map-modal').classList.add('hidden');
+    }
+
+    // Communication Functions
+    function callDeliveryPerson() {
+      if (currentTrackingOrder?.deliveryPartner) {
+        const phone = currentTrackingOrder.deliveryPartner.phone;
+        const confirmed = confirm(`Call ${currentTrackingOrder.deliveryPartner.name} at ${phone}?`);
+        if (confirmed) {
+          // In a real app, this would initiate a phone call
+          window.open(`tel:${phone.replace(/[^0-9+]/g, '')}`);
+          showToast('Calling delivery partner...', 'success');
+        }
+      }
+    }
+
+    function messageDeliveryPerson() {
+      if (currentTrackingOrder?.deliveryPartner) {
+        const phone = currentTrackingOrder.deliveryPartner.phone;
+        const message = prompt('Enter your message for the delivery partner:');
+        if (message) {
+          // In a real app, this would send an SMS or in-app message
+          const smsUrl = `sms:${phone.replace(/[^0-9+]/g, '')}?body=${encodeURIComponent(message)}`;
+          window.open(smsUrl);
+          showToast('Message sent to delivery partner', 'success');
+        }
+      }
+    }
+
+    function shareTrackingLink() {
+      const trackingUrl = `${window.location.origin}${window.location.pathname}?track=${currentTrackingOrder?.id}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: `Track Order #${currentTrackingOrder?.id}`,
+          text: 'Track my FreshFlow delivery in real-time',
+          url: trackingUrl
+        });
+      } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(trackingUrl).then(() => {
+          showToast('Tracking link copied to clipboard!', 'success');
+        }).catch(() => {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = trackingUrl;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          showToast('Tracking link copied!', 'success');
+        });
+      }
+    }
+
+    // Auto-update order status when delivery person reaches customer
+    function checkDeliveryCompletion() {
+      if (!deliveryPersonLocation || !customerLocation) return;
+      
+      const distance = calculateDistance(deliveryPersonLocation, customerLocation);
+      
+      // If delivery person is very close (within 50 meters), mark as delivered
+      if (distance < 0.05 && currentTrackingOrder) {
+        setTimeout(() => {
+          currentTrackingOrder.status = 'delivered';
+          updateTrackingStatus('delivered');
+          stopGPSTracking();
+          
+          // Add final delivery update
+          const updatesContainer = document.getElementById('delivery-updates');
+          const updateElement = document.createElement('div');
+          updateElement.className = 'text-sm text-gray-600 bg-green-100 p-2 rounded border-l-4 border-green-500';
+          updateElement.innerHTML = `<span class="font-medium">Just now:</span> ✅ Order delivered successfully!`;
+          updatesContainer.insertBefore(updateElement, updatesContainer.firstChild);
+          
+          showToast('🎉 Order delivered successfully!', 'success');
+        }, 5000); // Wait 5 seconds to simulate delivery completion
+      }
+    }
+
+    // Enhanced status update function
+    function updateOrderStatus(orderId, newStatus) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        const oldStatus = order.status;
+        order.status = newStatus;
+        order.lastUpdated = new Date().toLocaleString();
+        
+        // Start GPS tracking when order goes out for delivery
+        if (newStatus === 'out-for-delivery' && currentTrackingOrder?.id === orderId) {
+          initializeGPSTracking(order);
+        }
+        
+        // Stop GPS tracking when order is delivered or cancelled
+        if ((newStatus === 'delivered' || newStatus === 'cancelled') && currentTrackingOrder?.id === orderId) {
+          stopGPSTracking();
+        }
+        
+        // Real-time update for customers
+        updateCustomerOrderStatus(orderId, newStatus, oldStatus);
+        
+        loadAdminOrders();
+        
+        // Show admin feedback
+        showToast(`Order #${orderId} status updated to ${getOrderStatusText(newStatus)}`, 'success');
+      }
+    }
+
+    // Real-time order status updates for customers
+    function updateCustomerOrderStatus(orderId, newStatus, oldStatus) {
+      // Update My Orders modal if it's open
+      if (!document.getElementById('my-orders-modal').classList.contains('hidden')) {
+        loadMyOrders();
+        
+        // Show notification to customer if status changed significantly
+        const importantStatusChanges = ['processing', 'ready', 'out-for-delivery', 'delivered'];
+        if (importantStatusChanges.includes(newStatus)) {
+          showCustomerStatusNotification(orderId, newStatus);
+        }
+      }
+      
+      // Update tracking modal if it's open for this order
+      if (!document.getElementById('tracking-modal').classList.contains('hidden') && 
+          currentTrackingOrder?.id === orderId) {
+        updateTrackingStatus(newStatus);
+        
+        // Add status update to delivery updates
+        const updatesContainer = document.getElementById('delivery-updates');
+        if (updatesContainer) {
+          const updateElement = document.createElement('div');
+          updateElement.className = 'text-sm text-gray-600 bg-blue-50 p-2 rounded border-l-4 border-blue-500';
+          updateElement.innerHTML = `<span class="font-medium">Just now:</span> ${getOrderStatusText(newStatus)}`;
+          updatesContainer.insertBefore(updateElement, updatesContainer.firstChild);
+          
+          // Keep only last 5 updates
+          while (updatesContainer.children.length > 5) {
+            updatesContainer.removeChild(updatesContainer.lastChild);
+          }
+        }
+      }
+      
+      // Store status change in localStorage for persistence
+      const statusHistory = JSON.parse(localStorage.getItem('orderStatusHistory') || '{}');
+      if (!statusHistory[orderId]) {
+        statusHistory[orderId] = [];
+      }
+      statusHistory[orderId].push({
+        status: newStatus,
+        timestamp: new Date().toLocaleString(),
+        previousStatus: oldStatus
+      });
+      localStorage.setItem('orderStatusHistory', JSON.stringify(statusHistory));
+    }
+
+    function showCustomerStatusNotification(orderId, newStatus) {
+      const statusMessages = {
+        'processing': '👨‍🍳 Your order is being prepared!',
+        'ready': '📦 Your order is ready for delivery!',
+        'out-for-delivery': '🚚 Your order is out for delivery!',
+        'delivered': '✅ Your order has been delivered!'
+      };
+      
+      const message = statusMessages[newStatus] || `Order status updated to ${getOrderStatusText(newStatus)}`;
+      
+      // Show toast notification
+      showToast(`Order #${orderId}: ${message}`, 'success');
+      
+      // Play notification sound for important updates
+      if (['out-for-delivery', 'delivered'].includes(newStatus)) {
+        playCustomerNotificationSound();
+      }
+      
+      // Show browser notification if supported
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`FreshFlow - Order #${orderId}`, {
+          body: message,
+          icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMzMzIiByeD0iMTYiLz4KPHN2ZyB4PSIxNiIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjZmZmIj4KICA8cGF0aCBkPSJNMTIgMkwxMy4wOSA4LjI2TDIwIDlMMTMuMDkgOS43NEwxMiAxNkwxMC45MSA5Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIi8+CiAgPHBhdGggZD0iTTE5IDE1TDE5LjUgMTdMMjIgMTcuNUwxOS41IDE4TDE5IDIwTDE4LjUgMThMMTYgMTcuNUwxOC41IDE3TDE5IDE1WiIvPgogIDxwYXRoIGQ9Ik01IDZMNS41IDcuNUw3IDhMNS41IDguNUw1IDEwTDQuNSA4LjVMMyA4TDQuNSA3LjVMNSA2WiIvPgo8L3N2Zz4KPC9zdmc+',
+          badge: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMzMzMiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZiI+CiAgPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDkuNzRMMTIgMTZMMTAuOTEgOS43NEw0IDlMMTAuOTEgOC4yNkwxMiAyWiIvPgo8L3N2Zz4KPC9zdmc+'
+        });
+      }
+    }
+
+    function playCustomerNotificationSound() {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create a pleasant notification sound for customers
+        const playTone = (frequency, duration, delay = 0) => {
+          setTimeout(() => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+          }, delay);
+        };
+        
+        // Play pleasant notification: ascending tones
+        playTone(523, 0.2, 0);     // C5
+        playTone(659, 0.2, 200);   // E5
+        playTone(784, 0.3, 400);   // G5
+        
+      } catch (error) {
+        console.log('Customer notification sound failed:', error);
+      }
+    }
+
+    // Request notification permission on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Request notification permission
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    });
+
+    // Check for delivery completion periodically
+    setInterval(() => {
+      if (gpsTrackingInterval && currentTrackingOrder) {
+        checkDeliveryCompletion();
+      }
+    }, 10000); // Check every 10 seconds
 
     // UPI Payment Functions
     function showUPIPaymentOptions(order) {
@@ -2492,14 +3971,48 @@
       const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
       if (!pendingOrder) return;
 
-      // Show confirmation dialog
-      const confirmed = confirm(`⚠️ IMPORTANT: Have you completed the actual UPI payment of ₹${pendingOrder.total} to 9603831708@ybl?\n\nClick OK only if you have successfully transferred the money. This will confirm your order.`);
+      // Show strict confirmation dialog
+      const confirmed = confirm(`⚠️ REAL PAYMENT REQUIRED: Have you completed the actual UPI payment of ₹${pendingOrder.total} to 9603831708@ybl?\n\n🚨 WARNING: This requires REAL MONEY TRANSFER. Only click OK if you have successfully sent the actual payment from your bank account.\n\nFalse confirmation will result in order cancellation.`);
       
       if (confirmed) {
-        // Ask for transaction reference (optional but recommended)
-        const transactionRef = prompt('Please enter your UPI transaction reference number (optional but recommended for faster processing):');
+        // MANDATORY transaction reference - not optional
+        let transactionRef = '';
+        let attempts = 0;
+        const maxAttempts = 3;
         
-        handlePaymentSuccess(pendingOrder, transactionRef);
+        while (attempts < maxAttempts && (!transactionRef || transactionRef.trim().length < 8)) {
+          attempts++;
+          transactionRef = prompt(`🔴 MANDATORY: Enter your UPI Transaction ID/Reference Number\n\n📱 Find this in your UPI app under transaction history\n💳 Example: T2312345678901, 334567890123, etc.\n\n⚠️ Minimum 8 characters required\nAttempt ${attempts}/${maxAttempts}:`);
+          
+          if (!transactionRef) {
+            alert('❌ Transaction ID is required to confirm real payment. Order will be cancelled if not provided.');
+            if (attempts === maxAttempts) {
+              cancelUPIPayment();
+              return;
+            }
+          } else if (transactionRef.trim().length < 8) {
+            alert(`❌ Transaction ID too short. Please enter the complete transaction reference (minimum 8 characters). You entered: ${transactionRef.trim().length} characters.`);
+            if (attempts === maxAttempts) {
+              alert('❌ Maximum attempts exceeded. Order cancelled.');
+              cancelUPIPayment();
+              return;
+            }
+          }
+        }
+        
+        if (transactionRef && transactionRef.trim().length >= 8) {
+          // Additional verification questions
+          const paymentApp = prompt('📱 Which UPI app did you use for payment?\n(PhonePe/GooglePay/Paytm/BHIM/Other)');
+          const paymentTime = prompt('🕐 What time did you complete the payment?\n(e.g., 2:30 PM, 14:30, etc.)');
+          
+          if (paymentApp && paymentTime) {
+            handlePaymentSuccess(pendingOrder, transactionRef.trim(), paymentApp, paymentTime);
+          } else {
+            alert('❌ Payment verification incomplete. Please provide all required details.');
+          }
+        }
+      } else {
+        alert('❌ Payment not confirmed. Order remains pending. Complete the payment and try again.');
       }
     }
 
@@ -2541,7 +4054,7 @@
       }
     }
 
-    function handlePaymentSuccess(order, transactionRef = null) {
+    function handlePaymentSuccess(order, transactionRef, paymentApp, paymentTime) {
       // Clear the checking interval
       if (paymentCheckInterval) {
         clearInterval(paymentCheckInterval);
@@ -2552,16 +4065,50 @@
       window.removeEventListener('focus', handleAppFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
 
-      // Generate transaction ID (use provided reference or generate one)
-      const transactionId = transactionRef || 'TXN' + Date.now().toString().slice(-8);
+      // Store comprehensive payment details
+      const paymentDetails = {
+        transactionId: transactionRef,
+        paymentApp: paymentApp,
+        userReportedTime: paymentTime,
+        systemTimestamp: new Date().toLocaleString(),
+        paymentAmount: order.total,
+        paymentTo: '9603831708@ybl',
+        verificationStatus: 'user-confirmed', // In real app, this would be 'gateway-verified'
+        ipAddress: 'hidden-for-privacy', // In real app, would capture actual IP
+        deviceInfo: navigator.userAgent.substring(0, 50) + '...',
+        orderConfirmationTime: new Date().toISOString()
+      };
       
-      // Update order status
-      order.status = 'pending';
+      // Update order with comprehensive payment information
+      order.status = 'payment-confirmed';
       order.paymentStatus = 'completed';
       order.paymentTimestamp = new Date().toLocaleString();
-      order.transactionId = transactionId;
+      order.transactionId = transactionRef;
       order.paymentMethod = 'upi';
-      order.realPaymentConfirmed = true; // Flag to indicate real payment was made
+      order.paymentApp = paymentApp;
+      order.userReportedPaymentTime = paymentTime;
+      order.realPaymentConfirmed = true;
+      order.paymentDetails = paymentDetails;
+      order.paymentVerificationLevel = 'manual-confirmation'; // In real app: 'gateway-verified'
+      
+      // Add audit trail
+      order.auditTrail = [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'payment_initiated',
+          details: `UPI payment initiated for ₹${order.total}`
+        },
+        {
+          timestamp: new Date().toISOString(),
+          action: 'payment_confirmed',
+          details: `Payment confirmed via ${paymentApp} with transaction ID: ${transactionRef}`
+        },
+        {
+          timestamp: new Date().toISOString(),
+          action: 'order_confirmed',
+          details: 'Order confirmed and added to processing queue'
+        }
+      ];
 
       // Add order to confirmed orders
       orders.push(order);
@@ -2569,11 +4116,14 @@
       // Clear pending order
       localStorage.removeItem('pendingOrder');
 
+      // Send updated WhatsApp notification with payment confirmation
+      sendWhatsAppNotification(order);
+
       // Hide processing modal
       document.getElementById('payment-processing-modal').classList.add('hidden');
 
-      // Show success modal
-      document.getElementById('transaction-id').textContent = transactionId;
+      // Show success modal with detailed information
+      document.getElementById('transaction-id').textContent = transactionRef;
       document.getElementById('paid-amount').textContent = order.total;
       document.getElementById('payment-success-modal').classList.remove('hidden');
 
@@ -2584,6 +4134,18 @@
 
       // Set current order for tracking
       currentOrderId = order.id;
+      
+      // Show detailed success toast
+      showToast(`✅ Payment Confirmed! Transaction ID: ${transactionRef.substring(0, 12)}...`, 'success');
+      
+      // Log payment confirmation (in real app, this would go to secure server logs)
+      console.log('Payment Confirmed:', {
+        orderId: order.id,
+        transactionId: transactionRef,
+        amount: order.total,
+        timestamp: new Date().toISOString(),
+        app: paymentApp
+      });
     }
 
     function handlePaymentFailure(order, reason = 'Transaction failed') {
@@ -2782,6 +4344,210 @@
       showToast(`Welcome ${userData.name}! Your profile has been saved for future orders.`, 'success');
     });
 
+    // WhatsApp Notification Functions
+    function sendWhatsAppNotification(order) {
+      // Create detailed order message for WhatsApp
+      const itemsList = order.items.map(item => 
+        `• ${item.quantity}x ${item.name} - ₹${item.price * item.quantity}`
+      ).join('\n');
+      
+      const paymentStatus = order.paymentMethod === 'upi' ? 
+        (order.realPaymentConfirmed ? '✅ UPI PAID' : '⏳ UPI PENDING') : 
+        '💵 Cash on Delivery';
+      
+      const message = `🔔 *NEW ORDER ALERT* 🔔
+
+📋 *Order #${order.id}*
+📅 ${order.timestamp}
+
+👤 *Customer Details:*
+Name: ${order.customer.name}
+📞 Phone: ${order.customer.phone}
+📍 Address: ${order.customer.address}
+🌍 Location: ${order.customer.location || 'Not specified'}
+
+🛒 *Order Items:*
+${itemsList}
+
+💰 *Payment Details:*
+Subtotal: ₹${order.subtotal}
+Delivery: ₹${order.deliveryFee}
+*Total: ₹${order.total}*
+Payment: ${paymentStatus}
+
+⏰ *Delivery Time:* ${order.deliveryTime}
+${order.specialInstructions ? `📝 *Special Instructions:* ${order.specialInstructions}` : ''}
+
+${order.transactionId ? `💳 *Transaction ID:* ${order.transactionId}` : ''}
+${order.paymentApp ? `📱 *Payment App:* ${order.paymentApp}` : ''}
+
+🚀 *Action Required:* Please confirm and prepare order
+📱 Reply to this message to update order status
+
+---
+FreshFlow Order Management System`;
+
+      // Encode message for WhatsApp URL
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/919603831708?text=${encodedMessage}`;
+      
+      // Play notification sound
+      playNotificationSound();
+      
+      // Show admin notification popup
+      showAdminNotificationPopup(order);
+      
+      // Auto-open WhatsApp (will work on mobile devices)
+      try {
+        // Create a temporary link and click it
+        const link = document.createElement('a');
+        link.href = whatsappUrl;
+        link.target = '_blank';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success toast
+        showToast('📱 WhatsApp notification sent to admin!', 'success');
+      } catch (error) {
+        console.log('WhatsApp auto-open failed:', error);
+        // Fallback: show manual link
+        showManualWhatsAppLink(whatsappUrl, order);
+      }
+    }
+
+    function playNotificationSound() {
+      // Create audio context for notification sound
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create a more attention-grabbing notification sound
+        const playTone = (frequency, duration, delay = 0) => {
+          setTimeout(() => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+          }, delay);
+        };
+        
+        // Play notification sequence: high-low-high pattern
+        playTone(800, 0.2, 0);     // High tone
+        playTone(600, 0.2, 300);   // Low tone  
+        playTone(800, 0.3, 600);   // High tone (longer)
+        
+        // Repeat the sequence after 1 second for emphasis
+        playTone(800, 0.2, 1000);
+        playTone(600, 0.2, 1300);
+        playTone(800, 0.3, 1600);
+        
+      } catch (error) {
+        console.log('Audio notification failed:', error);
+        // Fallback: try to play a simple beep
+        try {
+          const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+          audio.play().catch(() => {});
+        } catch (e) {
+          console.log('Fallback audio failed');
+        }
+      }
+    }
+
+    function showAdminNotificationPopup(order) {
+      // Create notification popup
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-red-600 text-white p-6 rounded-lg shadow-2xl z-50 max-w-sm border-l-4 border-yellow-400 animate-pulse';
+      notification.innerHTML = `
+        <div class="flex items-start space-x-3">
+          <div class="text-2xl animate-bounce">🔔</div>
+          <div class="flex-1">
+            <h3 class="font-bold text-lg mb-2">NEW ORDER ALERT!</h3>
+            <p class="text-sm mb-2">Order #${order.id} - ₹${order.total}</p>
+            <p class="text-sm mb-2">Customer: ${order.customer.name}</p>
+            <p class="text-sm mb-3">Phone: ${order.customer.phone}</p>
+            <div class="flex space-x-2">
+              <button onclick="openWhatsAppManually('${order.id}')" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded font-medium">
+                📱 Open WhatsApp
+              </button>
+              <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" class="bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded">
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 30 seconds
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 30000);
+      
+      // Make it blink for attention
+      let blinkCount = 0;
+      const blinkInterval = setInterval(() => {
+        notification.style.opacity = notification.style.opacity === '0.5' ? '1' : '0.5';
+        blinkCount++;
+        if (blinkCount > 10) {
+          clearInterval(blinkInterval);
+          notification.style.opacity = '1';
+        }
+      }, 500);
+    }
+
+    function showManualWhatsAppLink(whatsappUrl, order) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg p-8 max-w-md w-full">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-4">📱</div>
+            <h2 class="text-2xl font-semibold mb-2">Send WhatsApp Notification</h2>
+            <p class="text-gray-600">Click the button below to send order details to admin</p>
+          </div>
+          
+          <div class="bg-green-50 p-4 rounded-lg mb-6">
+            <p class="text-sm text-green-800 mb-2"><strong>Order #${order.id}</strong></p>
+            <p class="text-sm text-green-800">Customer: ${order.customer.name}</p>
+            <p class="text-sm text-green-800">Total: ₹${order.total}</p>
+            <p class="text-sm text-green-800">To: 9603831708</p>
+          </div>
+          
+          <div class="flex space-x-3">
+            <button onclick="window.open('${whatsappUrl}', '_blank')" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+              📱 Open WhatsApp
+            </button>
+            <button onclick="this.parentElement.parentElement.parentElement.remove()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+
+    function openWhatsAppManually(orderId) {
+      const order = orders.find(o => o.id == orderId) || JSON.parse(localStorage.getItem('pendingOrder') || '{}');
+      if (order.id) {
+        sendWhatsAppNotification(order);
+      }
+    }
+
     // Form submission
     document.getElementById('checkout-form').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -2851,6 +4617,9 @@
         localStorage.setItem('pendingOrder', JSON.stringify(order));
         currentOrderId = order.id;
         
+        // Send WhatsApp notification for UPI orders (payment pending)
+        sendWhatsAppNotification(order);
+        
         // Close checkout modal
         closeCheckout();
         
@@ -2860,6 +4629,9 @@
         // For COD, confirm order immediately
         orders.push(order);
         currentOrderId = order.id;
+        
+        // Send WhatsApp notification for COD orders
+        sendWhatsAppNotification(order);
         
         // Show success modal
         document.getElementById('order-number').textContent = order.id;
@@ -2872,5 +4644,5 @@
       document.getElementById('checkout-form').reset();
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96656756938323ff',t:'MTc1MzcxNjQ3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'966a378f436385fd',t:'MTc1Mzc2Njk1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
